@@ -1,1267 +1,1281 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-    <title>CSK TikTok Downloader - Mobile Optimized</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        /* Theme Variables */
-        :root {
-            --bg-primary: linear-gradient(145deg, #0f0f1e 0%, #1a1a2f 100%);
-            --bg-secondary: rgba(255, 255, 255, 0.05);
-            --text-primary: white;
-            --text-secondary: #888;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-glow: 0 0 20px rgba(0, 242, 254, 0.3);
-        }
-
-        .light-theme {
-            --bg-primary: linear-gradient(145deg, #f0f2f5 0%, #ffffff 100%);
-            --bg-secondary: rgba(0, 0, 0, 0.02);
-            --text-primary: #333;
-            --text-secondary: #666;
-            --border-color: rgba(0, 0, 0, 0.1);
-            --accent-glow: 0 0 20px rgba(0, 242, 254, 0.5);
-        }
-
-        body {
-            background: var(--bg-primary);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 10px;
-            transition: background 0.3s ease;
-        }
-
-        /* Main Container - Fully Responsive */
-        .container {
-            background: var(--bg-secondary);
-            backdrop-filter: blur(10px);
-            border-radius: 25px;
-            padding: clamp(15px, 5vw, 40px);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: min(900px, 95%);
-            margin: 10px auto;
-        }
-
-        /* Theme Switcher */
-        .theme-switcher {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            background: var(--bg-secondary);
-            padding: 12px;
-            border-radius: 50px;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-            z-index: 1000;
-            transition: all 0.3s ease;
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            backdrop-filter: blur(10px);
-        }
-
-        /* Header */
-        .header {
-            text-align: center;
-            margin-bottom: clamp(20px, 5vh, 40px);
-        }
-
-        .logo {
-            font-size: clamp(50px, 15vw, 80px);
-            margin-bottom: 10px;
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.3));
-        }
-
-        h1 {
-            background: linear-gradient(135deg, #00f2fe, #ff0050);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: clamp(1.5rem, 6vw, 2.5rem);
-            margin-bottom: 10px;
-            font-weight: 700;
-            line-height: 1.2;
-            padding: 0 10px;
-        }
-
-        .subtitle {
-            color: var(--text-secondary);
-            font-size: clamp(0.9rem, 3vw, 1.1rem);
-            padding: 0 15px;
-        }
-
-        /* Stats Bar - Mobile Responsive */
-        .stats-bar {
-            display: flex;
-            justify-content: center;
-            gap: clamp(10px, 2vw, 30px);
-            margin-top: 20px;
-            color: gold;
-            font-size: clamp(0.7rem, 2.5vw, 0.9rem);
-            flex-wrap: wrap;
-            padding: 0 5px;
-        }
-
-        .stats-bar span {
-            background: rgba(255, 215, 0, 0.1);
-            padding: clamp(5px, 1.5vw, 8px) clamp(10px, 3vw, 20px);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            white-space: nowrap;
-        }
-
-        .csk-badge {
-            background: rgba(255, 215, 0, 0.2);
-            color: gold;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: clamp(0.7rem, 2.5vw, 0.8rem);
-            display: inline-block;
-            margin-top: 10px;
-            border: 1px solid gold;
-        }
-
-        /* Input Section */
-        .input-section {
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: clamp(15px, 4vw, 30px);
-            border: 1px solid var(--border-color);
-            margin-bottom: clamp(15px, 4vh, 30px);
-        }
-
-        .url-input-group {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .url-input {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .url-input input {
-            width: 100%;
-            padding: clamp(12px, 3vw, 18px) clamp(12px, 3vw, 20px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid var(--border-color);
-            border-radius: 15px;
-            color: var(--text-primary);
-            font-size: clamp(14px, 4vw, 16px);
-            transition: all 0.3s ease;
-        }
-
-        .url-input input:focus {
-            outline: none;
-            border-color: #00f2fe;
-            background: rgba(255, 255, 255, 0.15);
-            box-shadow: var(--accent-glow);
-        }
-
-        .url-input input::placeholder {
-            color: var(--text-secondary);
-            font-size: clamp(12px, 3.5vw, 14px);
-        }
-
-        .download-btn {
-            padding: clamp(12px, 3vw, 18px) clamp(20px, 5vw, 35px);
-            background: linear-gradient(135deg, #00f2fe, #ff0050);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: clamp(14px, 4vw, 18px);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            width: 100%;
-            max-width: 100%;
-        }
-
-        .download-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 30px rgba(255, 0, 80, 0.4);
-        }
-
-        /* Quick Actions - Scrollable on Mobile */
-        .quick-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .quick-btn {
-            padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 20px);
-            background: var(--bg-secondary);
-            border: 1px solid var(--border-color);
-            border-radius: 25px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: clamp(12px, 3vw, 14px);
-            white-space: nowrap;
-            flex: 0 1 auto;
-        }
-
-        .quick-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-primary);
-            border-color: #00f2fe;
-        }
-
-        /* Search Section */
-        .search-section {
-            margin-top: 20px;
-            padding: clamp(15px, 4vw, 20px);
-            background: var(--bg-secondary);
-            border-radius: 15px;
-            display: none;
-        }
-
-        .search-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .search-tab {
-            padding: clamp(6px, 2vw, 8px) clamp(12px, 3vw, 20px);
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 25px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            font-size: clamp(12px, 3vw, 14px);
-            transition: all 0.3s ease;
-        }
-
-        .search-tab.active {
-            background: linear-gradient(135deg, #00f2fe, #ff0050);
-            color: white;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: clamp(10px, 2.5vw, 12px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-size: clamp(14px, 3.5vw, 16px);
-        }
-
-        .search-results {
-            margin-top: 15px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .search-result-item {
-            padding: 12px;
-            margin: 8px 0;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            color: var(--text-primary);
-        }
-
-        .search-result-item:hover {
-            background: rgba(0, 242, 254, 0.2);
-            transform: translateX(5px);
-        }
-
-        /* Result Section - Mobile Optimized */
-        .result-section {
-            display: none;
-            background: var(--bg-secondary);
-            border-radius: 20px;
-            padding: clamp(15px, 4vw, 30px);
-            border: 1px solid var(--border-color);
-            margin-top: 20px;
-        }
-
-        .video-info {
-            display: flex;
-            gap: clamp(15px, 3vw, 20px);
-            flex-wrap: wrap;
-        }
-
-        .video-thumbnail {
-            flex: 0 0 100%;
-            max-width: 250px;
-            margin: 0 auto;
-        }
-
-        @media (min-width: 768px) {
-            .video-thumbnail {
-                flex: 0 0 200px;
-                margin: 0;
-            }
-        }
-
-        .video-thumbnail img {
-            width: 100%;
-            max-width: 250px;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: block;
-            margin: 0 auto;
-        }
-
-        .video-details {
-            flex: 1;
-            min-width: 250px;
-            width: 100%;
-        }
-
-        .video-title {
-            color: var(--text-primary);
-            font-size: clamp(1rem, 4vw, 1.2rem);
-            margin-bottom: 15px;
-            line-height: 1.4;
-            word-break: break-word;
-        }
-
-        .video-meta {
-            display: flex;
-            gap: clamp(10px, 3vw, 20px);
-            margin-bottom: 20px;
-            color: var(--text-secondary);
-            flex-wrap: wrap;
-            font-size: clamp(12px, 3.5vw, 14px);
-        }
-
-        .video-meta span {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        /* Trimmer Section */
-        .trimmer-section {
-            margin: 15px 0;
-            padding: clamp(12px, 3vw, 15px);
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-        }
-
-        .trimmer-range {
-            width: 100%;
-            margin: 10px 0;
-            height: 40px;
-            -webkit-appearance: none;
-            background: transparent;
-        }
-
-        .trimmer-range::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-        }
-
-        .trimmer-range::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #00f2fe;
-            border-radius: 50%;
-            margin-top: -8px;
-            cursor: pointer;
-        }
-
-        .trimmer-values {
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-secondary);
-            font-size: clamp(12px, 3vw, 14px);
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .action-btn {
-            padding: clamp(10px, 2.5vw, 12px) clamp(15px, 4vw, 25px);
-            border: none;
-            border-radius: 10px;
-            font-size: clamp(14px, 3.5vw, 16px);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: white;
-            flex: 1 1 auto;
-            min-width: 120px;
-        }
-
-        .action-btn.download-now {
-            background: linear-gradient(135deg, #00f2fe, #ff0050);
-        }
-
-        .action-btn.preview-btn {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-        }
-
-        .action-btn.share-btn {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-        }
-
-        .action-btn.save-btn {
-            background: linear-gradient(135deg, #fa709a, #fee140);
-        }
-
-        /* Social Share - Scrollable on Mobile */
-        .social-share {
-            display: flex;
-            gap: 8px;
-            margin: 15px 0;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .social-btn {
-            padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 15px);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: clamp(12px, 3vw, 14px);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex: 0 1 auto;
-        }
-
-        .social-btn.whatsapp-btn {
-            background: #25D366;
-        }
-
-        .social-btn.telegram-btn {
-            background: #0088cc;
-        }
-
-        .social-btn.facebook-btn {
-            background: #1877f2;
-        }
-
-        .social-btn.twitter-btn {
-            background: #1DA1F2;
-        }
-
-        /* Quality Selector */
-        .quality-selector {
-            margin: 15px 0;
-            padding: clamp(12px, 3vw, 15px);
-            background: rgba(255, 255, 255, 0.02);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .quality-selector select {
-            padding: clamp(8px, 2vw, 10px) clamp(12px, 3vw, 15px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: clamp(14px, 3.5vw, 16px);
-            flex: 1;
-            min-width: 150px;
-        }
-
-        /* History Section */
-        .history-section {
-            margin-top: 20px;
-            padding: clamp(12px, 3vw, 15px);
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            display: none;
-        }
-
-        .history-item {
-            padding: 12px 8px;
-            border-bottom: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            font-size: clamp(13px, 3.2vw, 14px);
-            cursor: pointer;
-            word-break: break-word;
-            transition: all 0.3s ease;
-        }
-
-        .history-item:hover {
-            background: rgba(0, 242, 254, 0.1);
-            color: var(--text-primary);
-        }
-
-        /* Batch Download */
-        .batch-download {
-            margin-top: 20px;
-            padding: clamp(15px, 4vw, 20px);
-            background: var(--bg-secondary);
-            border-radius: 12px;
-            display: none;
-        }
-
-        .batch-download textarea {
-            width: 100%;
-            padding: clamp(12px, 3vw, 15px);
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            color: var(--text-primary);
-            margin: 10px 0;
-            resize: vertical;
-            font-size: clamp(14px, 3.5vw, 16px);
-        }
-
-        /* Counter Section */
-        .counter-section {
-            margin-top: 20px;
-            padding: clamp(15px, 4vw, 20px);
-            background: linear-gradient(135deg, #667eea20, #764ba220);
-            border-radius: 12px;
-            text-align: center;
-        }
-
-        .counter-number {
-            font-size: clamp(2rem, 8vw, 2.5rem);
-            font-weight: bold;
-            background: linear-gradient(135deg, #00f2fe, #ff0050);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.2;
-        }
-
-        /* Feature Tags - Scrollable Grid */
-        .feature-tags {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 8px;
-            margin: 20px 0;
-            padding: 0 5px;
-        }
-
-        .feature-tag {
-            padding: 6px 8px;
-            background: rgba(0, 242, 254, 0.1);
-            border-radius: 20px;
-            color: #00f2fe;
-            font-size: clamp(11px, 2.8vw, 12px);
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Footer */
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            color: var(--text-secondary);
-            font-size: clamp(12px, 3vw, 14px);
-            padding: 0 10px;
-        }
-
-        .watermark-note {
-            display: inline-block;
-            padding: 8px 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 25px;
-            color: var(--text-secondary);
-            font-size: clamp(11px, 2.8vw, 13px);
-            white-space: nowrap;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: none;
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .loader {
-            width: clamp(40px, 10vw, 50px);
-            height: clamp(40px, 10vw, 50px);
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top: 4px solid #00f2fe;
-            border-right: 4px solid #ff0050;
-            border-radius: 50%;
-            animation: spin 1s infinite;
-            margin: 0 auto 15px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Error Message */
-        .error-message {
-            background: rgba(255, 0, 80, 0.2);
-            border: 1px solid #ff0050;
-            color: #ff8a8a;
-            padding: clamp(15px, 4vw, 20px);
-            border-radius: 12px;
-            text-align: center;
-            font-size: clamp(14px, 3.5vw, 16px);
-            word-break: break-word;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSK Downloader — Premium TikTok</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #c9a96e;
+      --gold-light: #e8cfa0;
+      --gold-dim: rgba(201,169,110,0.15);
+      --obsidian: #080a0f;
+      --surface: #0d1117;
+      --surface2: #131820;
+      --surface3: #1a2030;
+      --border: rgba(201,169,110,0.2);
+      --border-bright: rgba(201,169,110,0.5);
+      --text: #f0ece4;
+      --text-dim: #7a7060;
+      --red: #ff2d5e;
+      --cyan: #00d4ff;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 32px 80px rgba(0,0,0,0.7);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--obsidian);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      cursor: default;
+    }
+
+    /* ── Animated background ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(201,169,110,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0,212,255,0.04) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255,45,94,0.03) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Grain overlay ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: clamp(24px, 5vw, 60px) clamp(16px, 4vw, 40px);
+    }
+
+    /* ── Theme toggle ── */
+    .theme-toggle {
+      position: fixed; top: 20px; right: 20px; z-index: 100;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 18px;
+      transition: all .3s;
+      backdrop-filter: blur(12px);
+    }
+    .theme-toggle:hover { border-color: var(--gold); transform: rotate(20deg); }
+
+    /* ── Header ── */
+    .header {
+      text-align: center;
+      padding-bottom: clamp(28px, 5vh, 52px);
+      animation: fadeUp .8s ease both;
+    }
+
+    .crown {
+      font-size: clamp(40px, 10vw, 64px);
+      display: block;
+      margin-bottom: 16px;
+      animation: float 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(201,169,110,0.5));
+    }
+
+    @keyframes float {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 7vw, 3.8rem);
+      font-weight: 300;
+      letter-spacing: .05em;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold), #a07840);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .tagline {
+      font-size: clamp(.8rem, 2.5vw, .95rem);
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 20px;
+    }
+
+    .badges {
+      display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .badge {
+      padding: 5px 14px;
+      border-radius: 100px;
+      font-size: .72rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      background: var(--gold-dim);
+    }
+    .badge.gold { border-color: var(--gold); color: var(--gold); }
+
+    .stats-row {
+      display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;
+    }
+    .stat-pill {
+      padding: 6px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: .78rem;
+      color: var(--gold);
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: clamp(20px,4vh,36px) 0;
+      animation: fadeUp .9s ease both;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+    .divider-icon { color: var(--gold); font-size: 14px; letter-spacing: 4px; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(20px, 4vw, 36px);
+      margin-bottom: 16px;
+      transition: border-color .3s;
+      animation: fadeUp 1s ease both;
+    }
+    .card:hover { border-color: var(--border-bright); }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      letter-spacing: .05em;
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    /* ── Input ── */
+    .input-row {
+      display: flex; gap: 10px; flex-wrap: wrap;
+    }
+
+    .input-wrap {
+      flex: 1; min-width: 200px; position: relative;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 14px 18px 14px 46px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(13px, 3.5vw, 15px);
+      transition: all .3s;
+      outline: none;
+    }
+    .input-wrap input:focus {
+      border-color: var(--gold);
+      background: var(--surface3);
+      box-shadow: 0 0 0 4px rgba(201,169,110,.08), 0 0 20px rgba(201,169,110,.1);
+    }
+    .input-wrap input::placeholder { color: var(--text-dim); }
+    .input-icon {
+      position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 16px; pointer-events: none;
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      padding: 14px clamp(20px, 5vw, 32px);
+      background: linear-gradient(135deg, var(--gold), #a07840);
+      border: none; border-radius: var(--radius-sm);
+      color: var(--obsidian);
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(13px, 3.5vw, 15px);
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      transition: all .3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      white-space: nowrap;
+      min-width: 120px;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(201,169,110,0.35);
+    }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-secondary {
+      padding: 10px 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-dim);
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(12px, 3vw, 13px);
+      cursor: pointer;
+      transition: all .3s;
+      display: flex; align-items: center; gap: 6px;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+    .btn-ghost {
+      padding: 8px 14px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      color: var(--text-dim);
+      font-size: 12px;
+      cursor: pointer;
+      transition: all .3s;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Quick actions ── */
+    .quick-row {
+      display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap;
+    }
+
+    /* ── Loading ── */
+    .loader-wrap {
+      display: none; text-align: center; padding: 40px 0;
+    }
+    .loader-ring {
+      width: 48px; height: 48px; margin: 0 auto 16px;
+      border: 3px solid var(--surface3);
+      border-top: 3px solid var(--gold);
+      border-right: 3px solid var(--red);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text {
+      font-size: .85rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--text-dim);
+    }
+    .loader-dots::after {
+      content: '';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots {
+      0%,20% { content: ''; } 40% { content: '.'; }
+      60% { content: '..'; } 80%,100% { content: '...'; }
+    }
+
+    /* ── Result ── */
+    .result-card {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+      animation: fadeUp .5s ease both;
+    }
+    .result-header {
+      padding: 14px 20px;
+      background: linear-gradient(90deg, var(--gold-dim), transparent);
+      border-bottom: 1px solid var(--border);
+      font-size: .75rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--gold);
+    }
+    .result-body { padding: clamp(16px, 3vw, 28px); }
+    .result-inner {
+      display: flex; gap: clamp(16px, 3vw, 28px); flex-wrap: wrap;
+    }
+
+    .thumb-wrap {
+      flex: 0 0 auto; width: clamp(120px, 30%, 180px);
+      align-self: flex-start;
+    }
+    .thumb-wrap img {
+      width: 100%; border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 20px 50px rgba(0,0,0,.5);
+      display: block;
+    }
+
+    .result-info { flex: 1; min-width: 200px; }
+
+    .video-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 12px;
+      word-break: break-word;
+    }
+
+    .meta-row {
+      display: flex; gap: 12px; flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .meta-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .8rem; color: var(--text-dim);
+      padding: 4px 10px;
+      background: var(--surface2);
+      border-radius: 100px;
+      border: 1px solid var(--border);
+    }
+
+    /* ── Quality selector ── */
+    .quality-row {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .quality-label {
+      font-size: .78rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-dim); white-space: nowrap;
+    }
+    .quality-select {
+      flex: 1; min-width: 140px;
+      padding: 9px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 13px;
+      outline: none; cursor: pointer;
+      transition: border-color .3s;
+    }
+    .quality-select:focus { border-color: var(--gold); }
+
+    /* ── Action row ── */
+    .action-row {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .action-btn {
+      flex: 1 1 100px;
+      padding: clamp(10px,2.5vw,12px) clamp(12px,3vw,18px);
+      border: none; border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: clamp(12px, 3vw, 14px);
+      font-weight: 500;
+      cursor: pointer; transition: all .3s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      color: white;
+      min-width: 90px;
+    }
+    .btn-dl { background: linear-gradient(135deg, var(--gold), #a07840); color: var(--obsidian); }
+    .btn-preview { background: var(--surface3); border: 1px solid var(--border); color: var(--text); }
+    .btn-copy { background: var(--surface3); border: 1px solid var(--border); color: var(--text); }
+    .btn-save { background: var(--surface3); border: 1px solid var(--border); color: var(--text); }
+    .btn-dl:hover { box-shadow: 0 8px 24px rgba(201,169,110,.4); transform: translateY(-1px); }
+    .btn-preview:hover, .btn-copy:hover, .btn-save:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── Social share ── */
+    .social-row {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .social-btn {
+      flex: 1 1 80px;
+      padding: 9px 12px;
+      border: none; border-radius: var(--radius-sm);
+      font-size: clamp(11px, 2.8vw, 13px);
+      cursor: pointer; transition: all .3s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      color: white; font-family: 'DM Sans', sans-serif;
+      opacity: .85;
+    }
+    .social-btn:hover { opacity: 1; transform: translateY(-1px); }
+    .s-wa { background: #128C7E; }
+    .s-tg { background: #2AABEE; }
+    .s-fb { background: #1877F2; }
+    .s-tw { background: #1DA1F2; }
+
+    /* ── Trimmer ── */
+    .trimmer {
+      padding: 16px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+    .trimmer-title {
+      font-size: .78rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 12px;
+    }
+    .range-group { margin-bottom: 8px; }
+    .range-label { font-size: .75rem; color: var(--text-dim); margin-bottom: 4px; }
+    .trim-range {
+      width: 100%; height: 4px;
+      -webkit-appearance: none; appearance: none;
+      background: var(--surface3); border-radius: 2px; outline: none; cursor: pointer;
+    }
+    .trim-range::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      background: var(--gold); border-radius: 50%; cursor: pointer;
+      box-shadow: 0 0 8px rgba(201,169,110,.5);
+    }
+    .trim-values {
+      display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+      font-size: .78rem; color: var(--text-dim);
+    }
+
+    /* ── Audio download button ── */
+    .btn-audio {
+      width: 100%; padding: 12px; margin-top: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none; border-radius: var(--radius-sm); color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 14px;
+      font-weight: 500; cursor: pointer; transition: all .3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-audio:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(102,126,234,.4); }
+
+    /* ── Error ── */
+    .error-box {
+      display: none;
+      padding: 20px; border-radius: var(--radius-sm);
+      background: rgba(255,45,94,.08);
+      border: 1px solid rgba(255,45,94,.3);
+      color: #ff8a8a; font-size: .9rem; line-height: 1.5;
+      margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+
+    /* ── History ── */
+    .history-box {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .history-header {
+      padding: 14px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--gold-dim); border-bottom: 1px solid var(--border);
+    }
+    .history-header span { font-size: .78rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); }
+    .history-item {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: .83rem; color: var(--text-dim); cursor: pointer;
+      transition: all .25s; word-break: break-all;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item:hover { background: var(--gold-dim); color: var(--gold); padding-left: 26px; }
+    .history-empty { padding: 24px; text-align: center; color: var(--text-dim); font-size: .85rem; }
+
+    /* ── Batch ── */
+    .batch-box {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(16px, 3vw, 28px);
+      margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .batch-box textarea {
+      width: 100%; padding: 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 13px;
+      resize: vertical; outline: none; margin: 12px 0;
+      transition: border-color .3s; min-height: 100px;
+    }
+    .batch-box textarea:focus { border-color: var(--gold); }
+
+    /* ── Search ── */
+    .search-box {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: clamp(16px, 3vw, 24px);
+      margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .search-tabs {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .search-tab {
+      padding: 7px 16px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 100px; font-size: .78rem;
+      color: var(--text-dim); cursor: pointer; transition: all .3s;
+      letter-spacing: .05em;
+    }
+    .search-tab.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+    .search-input-wrap { position: relative; }
+    .search-input-wrap input {
+      width: 100%; padding: 12px 18px 12px 42px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none;
+      transition: all .3s;
+    }
+    .search-input-wrap input:focus { border-color: var(--gold); }
+    .search-input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+
+    .search-results { margin-top: 12px; }
+    .s-result {
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      background: var(--surface2); border: 1px solid var(--border);
+      margin-bottom: 8px; cursor: pointer; transition: all .25s;
+      font-size: .85rem; color: var(--text-dim);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .s-result:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+
+    /* ── Favorites panel ── */
+    .fav-box {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .fav-header {
+      padding: 14px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: var(--gold-dim); border-bottom: 1px solid var(--border);
+    }
+    .fav-header span { font-size: .78rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); }
+    .fav-item {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      font-size: .83rem; color: var(--text-dim); cursor: pointer;
+      transition: all .25s; word-break: break-all;
+    }
+    .fav-item:last-child { border-bottom: none; }
+    .fav-item:hover { background: var(--gold-dim); color: var(--gold); padding-left: 26px; }
+    .fav-empty { padding: 24px; text-align: center; color: var(--text-dim); font-size: .85rem; }
+
+    /* ── Counter ── */
+    .counter-card {
+      text-align: center;
+      padding: clamp(20px, 4vw, 36px);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 16px;
+      animation: fadeUp 1.1s ease both;
+    }
+    .counter-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.5rem, 8vw, 4rem);
+      font-weight: 300;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1; margin-bottom: 6px;
+    }
+    .counter-label {
+      font-size: .75rem; letter-spacing: .25em; text-transform: uppercase; color: var(--text-dim);
+    }
+
+    /* ── Features grid ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 8px; margin-bottom: 16px;
+      animation: fadeUp 1.2s ease both;
+    }
+    .feat {
+      padding: 10px 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: .75rem; color: var(--text-dim);
+      display: flex; align-items: center; gap: 7px;
+      transition: all .3s;
+    }
+    .feat:hover { border-color: var(--gold); color: var(--gold); }
+    .feat-icon { font-size: 14px; flex-shrink: 0; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center; padding: 24px 0;
+      font-size: .75rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--text-dim);
+      animation: fadeUp 1.3s ease both;
+    }
+    .footer span { color: var(--gold); }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1px solid var(--gold);
+      color: var(--gold); padding: 12px 24px; border-radius: 100px;
+      font-size: .83rem; letter-spacing: .05em;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .4s;
+      z-index: 9999; pointer-events: none; opacity: 0;
+      white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+    /* ── Light theme ── */
+    body.light {
+      --obsidian: #f5f0e8;
+      --surface: #ffffff;
+      --surface2: #f0ebe0;
+      --surface3: #e8e0d0;
+      --border: rgba(150,110,50,0.2);
+      --border-bright: rgba(150,110,50,0.5);
+      --text: #1a1510;
+      --text-dim: #8a7860;
+      --gold: #8a5c20;
+      --gold-light: #6b4010;
+      --gold-dim: rgba(138,92,32,0.1);
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+
+    /* ── Mobile responsive tweaks ── */
+    @media (max-width: 480px) {
+      .btn-primary { width: 100%; }
+      .input-row { flex-direction: column; }
+      .result-inner { flex-direction: column; align-items: center; }
+      .thumb-wrap { width: 160px; }
+      .action-btn { min-width: 70px; }
+    }
+  </style>
 </head>
 <body>
-    <!-- Theme Switcher -->
-    <div class="theme-switcher" onclick="toggleTheme()">
-        <span id="themeIcon">🌙</span>
+
+  <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+    <span id="themeIcon">🌙</span>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <div class="wrap">
+
+    <!-- Header -->
+    <div class="header">
+      <span class="crown">♛</span>
+      <div class="brand">CSK Downloader</div>
+      <div class="tagline">Premium TikTok — No Watermark</div>
+      <div class="badges">
+        <span class="badge gold">⚡ Mobile Ready</span>
+        <span class="badge">HD Quality</span>
+        <span class="badge">MP3 Audio</span>
+        <span class="badge">Batch Mode</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat-pill">📊 <span id="todayStat">1,847</span> today</div>
+        <div class="stat-pill">⭐ 4.9 / 5</div>
+        <div class="stat-pill">⚡ <span id="speedStat">0.4</span>s avg</div>
+        <div class="stat-pill">🎯 <span id="totalStat">50K+</span></div>
+      </div>
     </div>
 
-    <div class="container">
-        <div class="header">
-            <div class="logo">🎥</div>
-            <h1>CSK TikTok Downloader</h1>
-            <div class="subtitle">Download any TikTok video without watermark</div>
-            
-            <!-- Live Counter -->
-            <div class="stats-bar">
-                <span>📊 <span id="todayCount">1,234</span></span>
-                <span>⭐ 4.9/5</span>
-                <span>⚡ <span id="avgSpeed">0.5</span>s</span>
-                <span>🎯 <span id="totalCount">50K+</span></span>
-            </div>
-            <div class="csk-badge">⚡ MOBILE OPTIMIZED ⚡</div>
-        </div>
+    <div class="divider"><span class="divider-icon">✦ ✦ ✦</span></div>
 
-        <!-- Main Input -->
-        <div class="input-section">
-            <div class="url-input-group">
-                <div class="url-input">
-                    <input type="text" id="videoUrl" placeholder="Paste TikTok link here...">
-                </div>
-                <button class="download-btn" onclick="processVideo()">
-                    <span>🔍</span> Get
-                </button>
-            </div>
-            
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button class="quick-btn" onclick="clearInput()">🗑️ Clear</button>
-                <button class="quick-btn" onclick="showHistory()">📜 History</button>
-                <button class="quick-btn" onclick="toggleBatchMode()">📦 Batch</button>
-                <button class="quick-btn" onclick="toggleSearch()">🔍 Search</button>
-                <button class="quick-btn" onclick="copyCurrentLink()">📋 Paste</button>
-            </div>
+    <!-- Main input -->
+    <div class="card">
+      <div class="card-title">🔗 Paste TikTok URL</div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <span class="input-icon">🎬</span>
+          <input type="text" id="videoUrl" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off">
         </div>
+        <button class="btn-primary" onclick="processVideo()">
+          <span>✦</span> Download
+        </button>
+      </div>
+      <div class="quick-row">
+        <button class="btn-ghost" onclick="clearInput()">🗑 Clear</button>
+        <button class="btn-ghost" onclick="pasteFromClipboard()">📋 Paste</button>
+        <button class="btn-ghost" onclick="toggleSection('historyBox')">📜 History</button>
+        <button class="btn-ghost" onclick="toggleSection('favBox')">⭐ Favorites</button>
+        <button class="btn-ghost" onclick="toggleSection('batchBox')">📦 Batch</button>
+        <button class="btn-ghost" onclick="toggleSection('searchBox')">🔍 Search</button>
+      </div>
+    </div>
 
-        <!-- Search Section -->
-        <div id="searchSection" class="search-section">
-            <div class="search-tabs">
-                <span class="search-tab active" data-search-type="hashtag" onclick="searchBy('hashtag', this)"># Hashtags</span>
-                <span class="search-tab" data-search-type="music" onclick="searchBy('music', this)">🎵 Music</span>
-                <span class="search-tab" data-search-type="trending" onclick="searchBy('trending', this)">🔥 Trending</span>
-            </div>
-            <input type="text" id="searchInput" class="search-input" placeholder="Search hashtags...">
-            <div id="searchResults" class="search-results"></div>
+    <!-- History -->
+    <div class="history-box" id="historyBox">
+      <div class="history-header">
+        <span>📜 Recent Downloads</span>
+        <button class="btn-ghost" onclick="clearHistory()" style="font-size:11px; padding:5px 10px;">Clear All</button>
+      </div>
+      <div id="historyList"><div class="history-empty">No download history yet</div></div>
+    </div>
+
+    <!-- Favorites -->
+    <div class="fav-box" id="favBox">
+      <div class="fav-header">
+        <span>⭐ Saved Favorites</span>
+        <button class="btn-ghost" onclick="clearFavorites()" style="font-size:11px; padding:5px 10px;">Clear All</button>
+      </div>
+      <div id="favList"><div class="fav-empty">No favorites saved yet</div></div>
+    </div>
+
+    <!-- Batch -->
+    <div class="batch-box" id="batchBox">
+      <div class="card-title">📦 Batch Download</div>
+      <p style="font-size:.83rem; color:var(--text-dim); margin-bottom:4px;">Enter up to 5 TikTok URLs — one per line</p>
+      <textarea id="batchUrls" rows="5" placeholder="https://www.tiktok.com/@user/video/111&#10;https://www.tiktok.com/@user/video/222&#10;https://vm.tiktok.com/abc123"></textarea>
+      <button class="btn-primary" style="width:100%;" onclick="processBatch()">⬇ Download All (Max 5)</button>
+    </div>
+
+    <!-- Search -->
+    <div class="search-box" id="searchBox">
+      <div class="card-title">🔍 Explore TikTok</div>
+      <div class="search-tabs">
+        <div class="search-tab active" onclick="setSearchTab('hashtag', this)"># Hashtags</div>
+        <div class="search-tab" onclick="setSearchTab('music', this)">🎵 Music</div>
+        <div class="search-tab" onclick="setSearchTab('trending', this)">🔥 Trending</div>
+      </div>
+      <div class="search-input-wrap">
+        <span class="search-input-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search hashtags..." onkeydown="searchKeydown(event)">
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- Loader -->
+    <div class="loader-wrap" id="loaderWrap">
+      <div class="loader-ring"></div>
+      <div class="loader-text">Fetching video<span class="loader-dots"></span></div>
+    </div>
+
+    <!-- Error -->
+    <div class="error-box" id="errorBox"></div>
+
+    <!-- Result -->
+    <div class="result-card" id="resultCard">
+      <div class="result-header">✦ Video Ready to Download</div>
+      <div class="result-body">
+        <div class="result-inner" id="resultInner"></div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-icon">✦ ✦ ✦</span></div>
+
+    <!-- Counter -->
+    <div class="counter-card">
+      <div class="counter-num" id="globalCounter">0</div>
+      <div class="counter-label">Total Downloads</div>
+    </div>
+
+    <!-- Features -->
+    <div class="features">
+      <div class="feat"><span class="feat-icon">⚡</span> No Watermark</div>
+      <div class="feat"><span class="feat-icon">🎥</span> HD Quality</div>
+      <div class="feat"><span class="feat-icon">📱</span> Mobile First</div>
+      <div class="feat"><span class="feat-icon">🎵</span> MP3 Audio</div>
+      <div class="feat"><span class="feat-icon">📦</span> Batch Mode</div>
+      <div class="feat"><span class="feat-icon">📜</span> History</div>
+      <div class="feat"><span class="feat-icon">⭐</span> Favorites</div>
+      <div class="feat"><span class="feat-icon">✂️</span> Trimmer</div>
+      <div class="feat"><span class="feat-icon">🌙</span> Dark / Light</div>
+      <div class="feat"><span class="feat-icon">#</span> Hashtag Search</div>
+      <div class="feat"><span class="feat-icon">🔗</span> Social Share</div>
+      <div class="feat"><span class="feat-icon">📊</span> Download Stats</div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>⚡ CSK</span> Premium Downloader &nbsp;·&nbsp; All rights reserved
+    </div>
+
+  </div><!-- /wrap -->
+
+  <script>
+    // ── State ──────────────────────────────────────────────────────────────
+    let history_ = JSON.parse(localStorage.getItem('csk_history') || '[]');
+    let favorites_ = JSON.parse(localStorage.getItem('csk_favorites') || '[]');
+    let counter_ = parseInt(localStorage.getItem('csk_counter') || '123456');
+    let searchTabType = 'hashtag';
+
+    // ── Init ───────────────────────────────────────────────────────────────
+    document.getElementById('globalCounter').textContent = counter_.toLocaleString();
+    document.getElementById('totalStat').textContent = counter_.toLocaleString();
+    renderHistory();
+    renderFavorites();
+    showTrending();
+
+    // ── Theme ──────────────────────────────────────────────────────────────
+    function toggleTheme() {
+      document.body.classList.toggle('light');
+      document.getElementById('themeIcon').textContent =
+        document.body.classList.contains('light') ? '☀️' : '🌙';
+    }
+
+    // ── Toast ──────────────────────────────────────────────────────────────
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+    }
+
+    // ── Section toggle ─────────────────────────────────────────────────────
+    function toggleSection(id) {
+      const el = document.getElementById(id);
+      const open = el.style.display !== 'none' && el.style.display !== '';
+      el.style.display = open ? 'none' : (id === 'historyBox' || id === 'favBox' ? 'block' : 'block');
+    }
+
+    // ── Input helpers ──────────────────────────────────────────────────────
+    function clearInput() {
+      document.getElementById('videoUrl').value = '';
+      hideResult();
+    }
+
+    async function pasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+          document.getElementById('videoUrl').value = text.trim();
+          showToast('📋 Pasted from clipboard');
+        } else {
+          showToast('Clipboard is empty');
+        }
+      } catch {
+        showToast('Please paste manually (Ctrl+V / ⌘V)');
+      }
+    }
+
+    function hideResult() {
+      document.getElementById('resultCard').style.display = 'none';
+      document.getElementById('errorBox').style.display = 'none';
+    }
+
+    // ── URL validation ─────────────────────────────────────────────────────
+    function isTikTokUrl(url) {
+      return /tiktok\.com/.test(url) || /vm\.tiktok\.com/.test(url) || /vt\.tiktok\.com/.test(url);
+    }
+
+    // ── Main process ───────────────────────────────────────────────────────
+    async function processVideo() {
+      const url = document.getElementById('videoUrl').value.trim();
+      if (!url) { showToast('⚠️ Please enter a TikTok URL'); return; }
+      if (!isTikTokUrl(url)) { showError('❌ Please enter a valid TikTok URL (tiktok.com, vm.tiktok.com, vt.tiktok.com)'); return; }
+
+      showLoader(true);
+      hideResult();
+
+      try {
+        const data = await fetchTikTokData(url);
+        showLoader(false);
+        if (data) {
+          displayResult(data);
+          addToHistory(data);
+          incrementCounter();
+        } else {
+          showError('❌ Could not fetch video. Make sure the video is public and the URL is correct.');
+        }
+      } catch (err) {
+        showLoader(false);
+        showError('❌ Error: ' + err.message);
+      }
+    }
+
+    async function fetchTikTokData(url) {
+      const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+      const json = await res.json();
+      if (json.code === 0 && json.data) {
+        const d = json.data;
+        return {
+          title: d.title || 'TikTok Video',
+          play: d.play || d.wmplay || '',
+          wmplay: d.wmplay || '',
+          music: d.music || '',
+          cover: d.cover || '',
+          duration: d.duration || 0,
+          author: d.author?.unique_id || 'tiktok_user',
+          views: d.play_count ?? 'N/A',
+          likes: d.digg_count ?? 'N/A',
+          url: url
+        };
+      }
+      return null;
+    }
+
+    // ── Loader ─────────────────────────────────────────────────────────────
+    function showLoader(on) {
+      document.getElementById('loaderWrap').style.display = on ? 'block' : 'none';
+    }
+
+    // ── Error ──────────────────────────────────────────────────────────────
+    function showError(msg) {
+      const eb = document.getElementById('errorBox');
+      eb.textContent = msg;
+      eb.style.display = 'block';
+    }
+
+    // ── Counter ────────────────────────────────────────────────────────────
+    function incrementCounter() {
+      counter_++;
+      localStorage.setItem('csk_counter', counter_);
+      document.getElementById('globalCounter').textContent = counter_.toLocaleString();
+      document.getElementById('totalStat').textContent = counter_.toLocaleString();
+      document.getElementById('speedStat').textContent = (Math.random() * .4 + .2).toFixed(1);
+    }
+
+    // ── Format number ──────────────────────────────────────────────────────
+    function fmtNum(n) {
+      if (n === 'N/A' || n == null) return 'N/A';
+      n = parseInt(n);
+      if (isNaN(n)) return 'N/A';
+      if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+      if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+      return n.toString();
+    }
+
+    function safeUrl(u, base) {
+      if (!u) return '';
+      return u.startsWith('http') ? u : base + u;
+    }
+
+    // ── Display result ─────────────────────────────────────────────────────
+    function displayResult(data) {
+      const base = 'https://www.tikwm.com';
+      const videoUrl = safeUrl(data.play, base);
+      const musicUrl = safeUrl(data.music, base);
+      const cover = data.cover || 'https://placehold.co/180x300/131820/c9a96e?text=No+Cover';
+
+      const authorSafe = escHtml(data.author);
+      const titleSafe = escHtml(data.title.substring(0, 120)) + (data.title.length > 120 ? '…' : '');
+      const videoUrlSafe = escAttr(videoUrl);
+      const musicUrlSafe = escAttr(musicUrl);
+
+      const trimmerHtml = data.duration > 0 ? buildTrimmer(data.duration) : '';
+
+      document.getElementById('resultInner').innerHTML = `
+        <div class="thumb-wrap">
+          <img src="${escAttr(cover)}" alt="Thumbnail"
+            onerror="this.src='https://placehold.co/180x300/131820/c9a96e?text=No+Cover'">
         </div>
+        <div class="result-info">
+          <div class="video-title">${titleSafe}</div>
+          <div class="meta-row">
+            <div class="meta-item">👤 @${authorSafe}</div>
+            <div class="meta-item">👁 ${fmtNum(data.views)}</div>
+            <div class="meta-item">❤️ ${fmtNum(data.likes)}</div>
+            <div class="meta-item">⏱ ${data.duration}s</div>
+          </div>
 
-        <!-- Batch Mode -->
-        <div id="batchMode" class="batch-download">
-            <h4 style="color: gold;">📦 Batch Mode</h4>
-            <p style="color: var(--text-secondary);">Multiple URLs (one per line, max 5)</p>
-            <textarea id="batchUrls" rows="4" placeholder="https://tiktok.com/@user/video/123456789&#10;https://tiktok.com/@user/video/987654321"></textarea>
-            <button class="action-btn download-now" onclick="processBatch()" style="width: 100%;">
-                ⬇️ Download All (Max 5)
+          ${trimmerHtml}
+
+          <div class="quality-row">
+            <span class="quality-label">Quality</span>
+            <select class="quality-select" id="qualitySelect">
+              <option value="hd">HD — Best Quality</option>
+              <option value="sd">SD — Smaller File</option>
+              <option value="audio">Audio Only (MP3)</option>
+            </select>
+          </div>
+
+          <div class="action-row">
+            <button class="action-btn btn-dl"
+              onclick="downloadWithQuality('${videoUrlSafe}', '${authorSafe}', '${musicUrlSafe}')">
+              ⬇ Download
             </button>
+            <button class="action-btn btn-preview"
+              onclick="window.open('${videoUrlSafe}', '_blank')">
+              👁 Preview
+            </button>
+            <button class="action-btn btn-copy"
+              onclick="copyLink('${escAttr(data.url)}')">
+              🔗 Copy
+            </button>
+            <button class="action-btn btn-save"
+              onclick="addToFavorites('${escAttr(data.url)}', '${escAttr(data.title.substring(0,80))}')">
+              ⭐ Save
+            </button>
+          </div>
+
+          <div class="social-row">
+            <button class="social-btn s-wa" onclick="shareWA('${escAttr(data.url)}')">📱 WhatsApp</button>
+            <button class="social-btn s-tg" onclick="shareTG('${escAttr(data.url)}')">✈️ Telegram</button>
+            <button class="social-btn s-fb" onclick="shareFB('${escAttr(data.url)}')">📘 Facebook</button>
+            <button class="social-btn s-tw" onclick="shareTW('${escAttr(data.url)}')">🐦 Twitter</button>
+          </div>
+
+          ${musicUrl ? `
+          <button class="btn-audio" onclick="dlVideo('${musicUrlSafe}', 'CSK_Audio_${authorSafe}.mp3')">
+            🎵 Download Audio (MP3)
+          </button>` : ''}
         </div>
+      `;
 
-        <!-- Loading -->
-        <div class="loading" id="loading">
-            <div class="loader"></div>
-            <div style="color: #00f2fe;">Processing...</div>
-        </div>
+      document.getElementById('resultCard').style.display = 'block';
+      document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
 
-        <!-- Results -->
-        <div class="result-section" id="resultSection"></div>
+    // ── Trimmer ────────────────────────────────────────────────────────────
+    function buildTrimmer(dur) {
+      return `
+        <div class="trimmer">
+          <div class="trimmer-title">✂️ Video Trimmer (Preview Only)</div>
+          <div class="range-group">
+            <div class="range-label">Start time: <strong id="startVal">0</strong>s</div>
+            <input type="range" class="trim-range" id="trimStart" min="0" max="${dur}" value="0" oninput="syncTrimmer()">
+          </div>
+          <div class="range-group">
+            <div class="range-label">End time: <strong id="endVal">${dur}</strong>s</div>
+            <input type="range" class="trim-range" id="trimEnd" min="0" max="${dur}" value="${dur}" oninput="syncTrimmer()">
+          </div>
+          <div class="trim-values">
+            <span>Start: <strong id="startDisp">0s</strong></span>
+            <span>End: <strong id="endDisp">${dur}s</strong></span>
+            <span>Clip: <strong id="durDisp">${dur}s</strong></span>
+          </div>
+        </div>`;
+    }
 
-        <!-- History -->
-        <div id="historySection" class="history-section">
-            <h4 style="color: gold;">📜 Recent Downloads</h4>
-            <div id="historyList"></div>
-            <button class="quick-btn" onclick="clearHistory()" style="width: 100%; margin-top: 10px;">Clear History</button>
-        </div>
+    function syncTrimmer() {
+      const s = document.getElementById('trimStart');
+      const e = document.getElementById('trimEnd');
+      if (!s || !e) return;
+      let sv = parseFloat(s.value);
+      let ev = parseFloat(e.value);
+      // Prevent overlap — clamp independently
+      if (sv > ev) { sv = ev; s.value = ev; }
+      document.getElementById('startVal').textContent = sv;
+      document.getElementById('endVal').textContent = ev;
+      document.getElementById('startDisp').textContent = sv + 's';
+      document.getElementById('endDisp').textContent = ev + 's';
+      document.getElementById('durDisp').textContent = (ev - sv).toFixed(1) + 's';
+    }
 
-        <!-- Counter Section -->
-        <div class="counter-section">
-            <div class="counter-number" id="globalCounter">1,23,456</div>
-            <div class="counter-label">Total Downloads</div>
-        </div>
-
-        <!-- Feature Tags -->
-        <div class="feature-tags">
-            <span class="feature-tag">⚡ No Watermark</span>
-            <span class="feature-tag">🎥 HD Quality</span>
-            <span class="feature-tag">📱 Mobile</span>
-            <span class="feature-tag">🔄 MP3</span>
-            <span class="feature-tag">📦 Batch</span>
-            <span class="feature-tag">📜 History</span>
-            <span class="feature-tag">⭐ Favorites</span>
-            <span class="feature-tag">🔍 Preview</span>
-            <span class="feature-tag">🌙 Dark/Light</span>
-            <span class="feature-tag">📊 Counter</span>
-            <span class="feature-tag">✂️ Trimmer</span>
-            <span class="feature-tag">📱 Share</span>
-            <span class="feature-tag"># Hashtag</span>
-            <span class="feature-tag">🎵 Music</span>
-        </div>
-
-        <div class="footer">
-            <span class="watermark-note">⚡ CSK ULTIMATE • Mobile Ready ⚡</span>
-        </div>
-    </div>
-
-    <script>
-        // Data Storage
-        let downloadHistory = JSON.parse(localStorage.getItem('csk_history')) || [];
-        let favorites = JSON.parse(localStorage.getItem('csk_favorites')) || [];
-        let downloadCounter = parseInt(localStorage.getItem('csk_counter')) || 123456;
-        let currentSearchType = 'hashtag';
-
-        // Theme Functions
-        function toggleTheme() {
-            document.body.classList.toggle('light-theme');
-            const icon = document.getElementById('themeIcon');
-            icon.textContent = document.body.classList.contains('light-theme') ? '☀️' : '🌙';
-        }
-
-        // Update Counter Display
-        function updateCounter() {
-            downloadCounter++;
-            localStorage.setItem('csk_counter', downloadCounter);
-            document.getElementById('globalCounter').textContent = downloadCounter.toLocaleString();
-            document.getElementById('todayCount').textContent = Math.floor(Math.random() * 2000 + 1000);
-            document.getElementById('avgSpeed').textContent = (Math.random() * 0.5 + 0.3).toFixed(1);
-        }
-
-        // Search Functions
-        function toggleSearch() {
-            const searchSection = document.getElementById('searchSection');
-            searchSection.style.display = searchSection.style.display === 'none' ? 'block' : 'none';
-            if (searchSection.style.display === 'block') {
-                showTrendingResults();
-            }
-        }
-
-        function searchBy(type, element) {
-            currentSearchType = type;
-            const tabs = document.querySelectorAll('.search-tab');
-            tabs.forEach(t => t.classList.remove('active'));
-            element.classList.add('active');
-            
-            const searchInput = document.getElementById('searchInput');
-            if (type === 'hashtag') {
-                searchInput.placeholder = 'Enter hashtag...';
-                searchInput.onkeypress = (e) => { if (e.key === 'Enter') searchHashtag(); };
-            } else if (type === 'music') {
-                searchInput.placeholder = 'Enter song name...';
-                searchInput.onkeypress = (e) => { if (e.key === 'Enter') searchMusic(); };
-            } else if (type === 'trending') {
-                searchInput.placeholder = 'Showing trending...';
-                showTrendingResults();
-            }
-        }
-
-        function searchHashtag() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
-            useHashtag(query.startsWith('#') ? query : '#' + query);
-        }
-
-        function searchMusic() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) {
-                alert('Please enter a song name');
-                return;
-            }
-            alert(`Searching for music: "${query}"\n(Demo feature - Music search coming soon!)`);
-        }
-
-        function showTrendingResults() {
-            const results = document.getElementById('searchResults');
-            results.innerHTML = `
-                <div class="search-result-item" onclick="useHashtag('#dance')">
-                    🔥 #dance - 2.5B views
-                </div>
-                <div class="search-result-item" onclick="useHashtag('#comedy')">
-                    😂 #comedy - 1.8B views
-                </div>
-                <div class="search-result-item" onclick="useHashtag('#fyp')">
-                    ⭐ #fyp - 1.5B views
-                </div>
-                <div class="search-result-item" onclick="useHashtag('#viral')">
-                    🚀 #viral - 1.2B views
-                </div>
-                <div class="search-result-item" onclick="useHashtag('#trending')">
-                    📈 #trending - 980M views
-                </div>
-                <div class="search-result-item" onclick="useHashtag('#music')">
-                    🎵 #music - 850M views
-                </div>
-            `;
-        }
-
-        function useHashtag(hashtag) {
-            alert(`Searching for ${hashtag} videos...\n(Demo feature - Full search coming soon!)\n\nTry pasting a TikTok video URL instead.`);
-            document.getElementById('searchInput').value = hashtag;
-        }
-
-        // Trimmer Functions
-        function showTrimmer(duration) {
-            if (!duration || duration <= 0) return '';
-            return `
-                <div class="trimmer-section">
-                    <h4 style="color: gold; margin-bottom: 10px;">✂️ Video Trimmer</h4>
-                    <input type="range" class="trimmer-range" id="trimStart" min="0" max="${duration}" value="0" oninput="updateTrimValues()">
-                    <input type="range" class="trimmer-range" id="trimEnd" min="0" max="${duration}" value="${duration}" oninput="updateTrimValues()">
-                    <div class="trimmer-values">
-                        <span>Start: <span id="startVal">0</span>s</span>
-                        <span>End: <span id="endVal">${duration}</span>s</span>
-                        <span>Duration: <span id="trimDuration">${duration}</span>s</span>
-                    </div>
-                </div>
-            `;
-        }
-
-        function updateTrimValues() {
-            const start = document.getElementById('trimStart');
-            const end = document.getElementById('trimEnd');
-            const startVal = document.getElementById('startVal');
-            const endVal = document.getElementById('endVal');
-            const trimDuration = document.getElementById('trimDuration');
-            
-            if (start && end && startVal && endVal && trimDuration) {
-                let startValue = parseFloat(start.value);
-                let endValue = parseFloat(end.value);
-                
-                if (startValue > endValue) {
-                    startValue = endValue;
-                    start.value = endValue;
-                }
-                if (endValue < startValue) {
-                    endValue = startValue;
-                    end.value = startValue;
-                }
-                
-                startVal.textContent = startValue;
-                endVal.textContent = endValue;
-                trimDuration.textContent = (endValue - startValue).toFixed(1);
-            }
-        }
-
-        // Share Functions
-        function shareOnWhatsApp(url) {
-            window.open(`https://wa.me/?text=${encodeURIComponent('Check this TikTok video: ' + url)}`, '_blank');
-        }
-
-        function shareOnTelegram(url) {
-            window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=Check this TikTok video!`, '_blank');
-        }
-
-        function shareOnFacebook(url) {
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-        }
-
-        function shareOnTwitter(url) {
-            window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=Check this TikTok video!`, '_blank');
-        }
-
-        // Download Functions
-        function downloadVideo(url, filename) {
-            if (!url) {
-                alert('No video URL available');
-                return;
-            }
-            
-            // Show download notification
-            const notification = document.createElement('div');
-            notification.style.cssText = 'position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #00f2fe; color: white; padding: 10px 20px; border-radius: 10px; z-index: 9999; animation: fadeOut 2s forwards;';
-            notification.textContent = `Downloading: ${filename}`;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => notification.remove(), 2000);
-            
-            // Try fetch first
-            fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.blob();
-                })
-                .then(blob => {
-                    const blobUrl = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = blobUrl;
-                    a.download = filename;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    window.URL.revokeObjectURL(blobUrl);
-                })
-                .catch(() => {
-                    // Fallback: open in new tab
-                    window.open(url, '_blank');
-                });
-        }
-
-        function downloadWithQuality(videoUrl, author, musicUrl) {
-            const qualitySelect = document.getElementById('qualitySelect');
-            if (!qualitySelect) {
-                downloadVideo(videoUrl, `CSK_Video_${author}.mp4`);
-                return;
-            }
-            
-            const quality = qualitySelect.value;
-            
-            if (quality === 'audio') {
-                if (musicUrl) {
-                    downloadVideo(musicUrl, `CSK_Audio_${author}.mp3`);
-                } else {
-                    alert('Audio not available for this video');
-                }
-            } else if (quality === 'sd') {
-                // For SD, just use the same video (API doesn't provide different qualities)
-                downloadVideo(videoUrl, `CSK_Video_${author}_SD.mp4`);
-            } else {
-                downloadVideo(videoUrl, `CSK_Video_${author}_HD.mp4`);
-            }
-        }
-
-        // Main Process Function
-        async function processVideo() {
-            const url = document.getElementById('videoUrl').value.trim();
-            
-            if (!url) {
-                alert('Please enter a TikTok video URL');
-                return;
-            }
-
-            if (!url.includes('tiktok.com')) {
-                showError('Please enter a valid TikTok URL');
-                return;
-            }
-
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('resultSection').style.display = 'none';
-
-            try {
-                let videoData = null;
-                
-                // Try TikWM API
-                try {
-                    const response = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
-                    const data = await response.json();
-                    
-                    if (data.code === 0 && data.data) {
-                        videoData = {
-                            title: data.data.title || 'TikTok Video',
-                            play: data.data.play || data.data.wmplay,
-                            wmplay: data.data.wmplay,
-                            music: data.data.music,
-                            cover: data.data.cover,
-                            duration: data.data.duration || 0,
-                            author: data.data.author?.unique_id || 'tiktok_user',
-                            views: data.data.play_count || 'N/A',
-                            likes: data.data.digg_count || 'N/A',
-                            url: url
-                        };
-                    }
-                } catch (e) {
-                    console.log('TikWM API failed:', e);
-                }
-
-                document.getElementById('loading').style.display = 'none';
-
-                if (videoData && videoData.play) {
-                    displayResult(videoData);
-                    addToHistory(videoData);
-                    updateCounter();
-                } else {
-                    showError('Could not fetch video. Please check the URL and try again.\n\nMake sure the video is public and the URL is correct.');
-                }
-
-            } catch (error) {
-                document.getElementById('loading').style.display = 'none';
-                showError('Error: ' + error.message);
-            }
-        }
-
-        // Display Result
-        function displayResult(data) {
-            const resultSection = document.getElementById('resultSection');
-            
-            const formatNumber = (num) => {
-                if (num === 'N/A') return num;
-                if (typeof num === 'string') num = parseInt(num);
-                if (isNaN(num)) return 'N/A';
-                if (num > 1000000) return (num/1000000).toFixed(1) + 'M';
-                if (num > 1000) return (num/1000).toFixed(1) + 'K';
-                return num;
-            };
-
-            let videoUrl = data.play;
-            if (videoUrl && !videoUrl.startsWith('http')) {
-                videoUrl = 'https://www.tikwm.com' + videoUrl;
-            }
-
-            const musicUrl = data.music ? (data.music.startsWith('http') ? data.music : 'https://www.tikwm.com' + data.music) : null;
-
-            resultSection.innerHTML = `
-                <div class="video-info">
-                    <div class="video-thumbnail">
-                        <img src="${data.cover || 'https://via.placeholder.com/200x350?text=No+Thumbnail'}" alt="Thumbnail" onerror="this.src='https://via.placeholder.com/200x350?text=No+Image'">
-                    </div>
-                    <div class="video-details">
-                        <div class="video-title">${escapeHtml(data.title.substring(0, 100))}${data.title.length > 100 ? '...' : ''}</div>
-                        <div class="video-meta">
-                            <span>👤 @${escapeHtml(data.author)}</span>
-                            <span>👁️ ${formatNumber(data.views)}</span>
-                            <span>❤️ ${formatNumber(data.likes)}</span>
-                            <span>⏱️ ${data.duration}s</span>
-                        </div>
-                        
-                        ${data.duration ? showTrimmer(data.duration) : ''}
-                        
-                        <div class="quality-selector">
-                            <span>Quality:</span>
-                            <select id="qualitySelect">
-                                <option value="hd">HD (Best Quality)</option>
-                                <option value="sd">SD (Small Size)</option>
-                                <option value="audio">Audio Only</option>
-                            </select>
-                        </div>
-                        
-                        <div class="action-buttons">
-                            <button class="action-btn download-now" onclick="downloadWithQuality('${videoUrl}', '${escapeHtml(data.author)}', '${musicUrl || ''}')">
-                                ⬇️ Download
-                            </button>
-                            <button class="action-btn preview-btn" onclick="window.open('${videoUrl}', '_blank')">
-                                👁️ Preview
-                            </button>
-                            <button class="action-btn share-btn" onclick="shareVideo('${data.url}')">
-                                🔗 Copy
-                            </button>
-                            <button class="action-btn save-btn" onclick="addToFavorites('${data.url}', '${escapeHtml(data.title)}')">
-                                ⭐ Save
-                            </button>
-                        </div>
-                        
-                        <div class="social-share">
-                            <button class="social-btn whatsapp-btn" onclick="shareOnWhatsApp('${data.url}')">📱 WhatsApp</button>
-                            <button class="social-btn telegram-btn" onclick="shareOnTelegram('${data.url}')">📱 Telegram</button>
-                            <button class="social-btn facebook-btn" onclick="shareOnFacebook('${data.url}')">📱 Facebook</button>
-                            <button class="social-btn twitter-btn" onclick="shareOnTwitter('${data.url}')">📱 Twitter</button>
-                        </div>
-                        
-                        ${musicUrl ? `
-                        <div style="margin-top: 15px;">
-                            <button class="action-btn download-now" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="downloadVideo('${musicUrl}', 'CSK_Audio_${escapeHtml(data.author)}.mp3')">
-                                🎵 Download Audio
-                            </button>
-                        </div>
-                        ` : ''}
-                        
-                        <div style="margin-top: 15px; text-align: center; color: gold; font-size: 0.8em;">
-                            ⚡ CSK Downloader ⚡
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            resultSection.style.display = 'block';
-            resultSection.scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Helper function to escape HTML
-        function escapeHtml(text) {
-            if (!text) return '';
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        // History Functions
-        function addToHistory(videoData) {
-            downloadHistory.unshift({
-                url: videoData.url,
-                title: videoData.title,
-                author: videoData.author,
-                time: new Date().toLocaleString()
-            });
-            
-            if (downloadHistory.length > 10) downloadHistory.pop();
-            localStorage.setItem('csk_history', JSON.stringify(downloadHistory));
-            updateHistoryDisplay();
-        }
-
-        function updateHistoryDisplay() {
-            const historyList = document.getElementById('historyList');
-            if (historyList && downloadHistory.length > 0) {
-                historyList.innerHTML = downloadHistory.map(item => `
-                    <div class="history-item" onclick="loadFromHistory('${escapeHtml(item.url)}')">
-                        📹 ${escapeHtml(item.title.substring(0, 40))}... - ${item.time}
-                    </div>
-                `).join('');
-            } else if (historyList) {
-                historyList.innerHTML = '<div style="padding: 10px; text-align: center; color: var(--text-secondary);">No history yet</div>';
-            }
-        }
-
-        function showHistory() {
-            const historySection = document.getElementById('historySection');
-            historySection.style.display = historySection.style.display === 'none' ? 'block' : 'none';
-            updateHistoryDisplay();
-        }
-
-        function loadFromHistory(url) {
-            document.getElementById('videoUrl').value = url;
-            processVideo();
-            const historySection = document.getElementById('historySection');
-            historySection.style.display = 'none';
-        }
-
-        function clearHistory() {
-            if (confirm('Are you sure you want to clear your download history?')) {
-                downloadHistory = [];
-                localStorage.removeItem('csk_history');
-                updateHistoryDisplay();
-                alert('History cleared!');
-            }
-        }
-
-        // Batch Functions
-        function toggleBatchMode() {
-            const batchMode = document.getElementById('batchMode');
-            batchMode.style.display = batchMode.style.display === 'none' ? 'block' : 'none';
-        }
-
-        async function processBatch() {
-            const urls = document.getElementById('batchUrls').value.split('\n').filter(u => u.trim());
-            if (urls.length === 0) {
-                alert('Please enter at least one URL');
-                return;
-            }
-            if (urls.length > 5) {
-                alert('Maximum 5 videos at a time for batch download');
-                return;
-            }
-            
-            let successCount = 0;
-            for (let i = 0; i < urls.length; i++) {
-                const url = urls[i].trim();
-                if (url) {
-                    document.getElementById('videoUrl').value = url;
-                    await processVideo();
-                    successCount++;
-                    if (i < urls.length - 1) {
-                        await new Promise(r => setTimeout(r, 2000));
-                    }
-                }
-            }
-            alert(`Batch download complete! Processed ${successCount} videos.`);
-        }
-
-        // Utility Functions
-        function clearInput() {
-            document.getElementById('videoUrl').value = '';
-        }
-
-        async function copyCurrentLink() {
-            try {
-                const text = await navigator.clipboard.readText();
-                document.getElementById('videoUrl').value = text;
-                alert('Link pasted!');
-            } catch (err) {
-                alert('Please paste manually (Ctrl+V)');
-            }
-        }
-
-        function addToFavorites(url, title) {
-            if (!favorites.some(f => f.url === url)) {
-                favorites.push({url, title, time: new Date().toLocaleString()});
-                localStorage.setItem('csk_favorites', JSON.stringify(favorites));
-                alert('Added to favorites! ⭐');
-            } else {
-                alert('Already in favorites!');
-            }
-        }
-
-        function shareVideo(url) {
-            navigator.clipboard.writeText(url);
-            alert('Link copied to clipboard! 📋');
-        }
-
-        function showError(message) {
-            const resultSection = document.getElementById('resultSection');
-            resultSection.innerHTML = `
-                <div class="error-message">
-                    ❌ ${message}
-                    <div style="margin-top: 15px; color: gold; font-size: 0.8em;">
-                        ⚡ CSK Downloader ⚡
-                    </div>
-                </div>
-            `;
-            resultSection.style.display = 'block';
-        }
-
-        // Initialize
-        document.getElementById('globalCounter').textContent = downloadCounter.toLocaleString();
-        document.getElementById('totalCount').textContent = downloadCounter.toLocaleString();
-        
-        // Add search input handler
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                if (currentSearchType === 'hashtag') searchHashtag();
-                else if (currentSearchType === 'music') searchMusic();
-            }
+    // ── Download ───────────────────────────────────────────────────────────
+    function dlVideo(url, filename) {
+      if (!url) { showToast('⚠️ No URL available'); return; }
+      // Try blob download; fallback to new tab (CORS-safe)
+      fetch(url)
+        .then(r => { if (!r.ok) throw new Error(); return r.blob(); })
+        .then(blob => {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+          showToast('✅ Download started: ' + filename);
+        })
+        .catch(() => {
+          // CORS fallback — open in new tab so browser saves it
+          window.open(url, '_blank');
+          showToast('📂 Opened in new tab — save from there');
         });
-        
-        // Set initial search type
-        searchBy('hashtag', document.querySelector('.search-tab.active'));
-        
-        console.log('CSK TikTok Downloader Ready!');
-    </script>
+    }
+
+    function downloadWithQuality(videoUrl, author, musicUrl) {
+      const q = document.getElementById('qualitySelect')?.value || 'hd';
+      if (q === 'audio') {
+        if (musicUrl) dlVideo(musicUrl, `CSK_Audio_${author}.mp3`);
+        else showToast('⚠️ Audio not available for this video');
+      } else if (q === 'sd') {
+        dlVideo(videoUrl, `CSK_Video_${author}_SD.mp4`);
+      } else {
+        dlVideo(videoUrl, `CSK_Video_${author}_HD.mp4`);
+      }
+    }
+
+    // ── Clipboard copy ─────────────────────────────────────────────────────
+    function copyLink(url) {
+      navigator.clipboard.writeText(url)
+        .then(() => showToast('📋 Link copied!'))
+        .catch(() => showToast('Could not copy — try manually'));
+    }
+
+    // ── Social share ───────────────────────────────────────────────────────
+    function shareWA(u) { window.open(`https://wa.me/?text=${encodeURIComponent('Watch this TikTok: ' + u)}`, '_blank'); }
+    function shareTG(u) { window.open(`https://t.me/share/url?url=${encodeURIComponent(u)}&text=Check this TikTok!`, '_blank'); }
+    function shareFB(u) { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(u)}`, '_blank'); }
+    function shareTW(u) { window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(u)}&text=Check this TikTok video!`, '_blank'); }
+
+    // ── History ────────────────────────────────────────────────────────────
+    function addToHistory(data) {
+      history_.unshift({ url: data.url, title: data.title, author: data.author, time: new Date().toLocaleString() });
+      if (history_.length > 10) history_.pop();
+      localStorage.setItem('csk_history', JSON.stringify(history_));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const el = document.getElementById('historyList');
+      if (!el) return;
+      if (history_.length === 0) {
+        el.innerHTML = '<div class="history-empty">No download history yet</div>';
+        return;
+      }
+      el.innerHTML = history_.map(h => `
+        <div class="history-item" onclick="loadUrl('${escAttr(h.url)}')">
+          📹 ${escHtml(h.title.substring(0, 50))}… &nbsp;<small style="opacity:.5">${h.time}</small>
+        </div>`).join('');
+    }
+
+    function clearHistory() {
+      if (!confirm('Clear all download history?')) return;
+      history_ = [];
+      localStorage.removeItem('csk_history');
+      renderHistory();
+      showToast('🗑 History cleared');
+    }
+
+    function loadUrl(url) {
+      document.getElementById('videoUrl').value = url;
+      toggleSection('historyBox');
+      processVideo();
+    }
+
+    // ── Favorites ──────────────────────────────────────────────────────────
+    function addToFavorites(url, title) {
+      if (favorites_.some(f => f.url === url)) {
+        showToast('Already in favorites ⭐');
+        return;
+      }
+      favorites_.push({ url, title, time: new Date().toLocaleString() });
+      localStorage.setItem('csk_favorites', JSON.stringify(favorites_));
+      renderFavorites();
+      showToast('⭐ Saved to favorites!');
+    }
+
+    function renderFavorites() {
+      const el = document.getElementById('favList');
+      if (!el) return;
+      if (favorites_.length === 0) {
+        el.innerHTML = '<div class="fav-empty">No favorites saved yet</div>';
+        return;
+      }
+      el.innerHTML = favorites_.map(f => `
+        <div class="fav-item" onclick="loadUrl('${escAttr(f.url)}')">
+          ⭐ ${escHtml(f.title.substring(0, 50))}… &nbsp;<small style="opacity:.5">${f.time}</small>
+        </div>`).join('');
+    }
+
+    function clearFavorites() {
+      if (!confirm('Clear all favorites?')) return;
+      favorites_ = [];
+      localStorage.removeItem('csk_favorites');
+      renderFavorites();
+      showToast('🗑 Favorites cleared');
+    }
+
+    // ── Batch ──────────────────────────────────────────────────────────────
+    async function processBatch() {
+      const lines = document.getElementById('batchUrls').value
+        .split('\n').map(l => l.trim()).filter(l => l && isTikTokUrl(l));
+      if (lines.length === 0) { showToast('⚠️ No valid TikTok URLs found'); return; }
+      if (lines.length > 5) { showToast('⚠️ Maximum 5 URLs at a time'); return; }
+      showToast(`⏳ Processing ${lines.length} videos…`);
+      for (let i = 0; i < lines.length; i++) {
+        document.getElementById('videoUrl').value = lines[i];
+        await processVideo();
+        if (i < lines.length - 1) await new Promise(r => setTimeout(r, 2200));
+      }
+      showToast(`✅ Batch complete! Processed ${lines.length} videos`);
+    }
+
+    // ── Search ─────────────────────────────────────────────────────────────
+    function setSearchTab(type, el) {
+      searchTabType = type;
+      document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      const inp = document.getElementById('searchInput');
+      if (type === 'hashtag') inp.placeholder = 'Enter hashtag…';
+      else if (type === 'music') inp.placeholder = 'Enter song name…';
+      else { inp.placeholder = 'Showing trending…'; showTrending(); }
+    }
+
+    function searchKeydown(e) {
+      if (e.key !== 'Enter') return;
+      if (searchTabType === 'hashtag') doHashtagSearch();
+      else if (searchTabType === 'music') doMusicSearch();
+    }
+
+    function doHashtagSearch() {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) return;
+      const tag = q.startsWith('#') ? q : '#' + q;
+      showToast(`Searching ${tag} — paste a video URL to download`);
+    }
+
+    function doMusicSearch() {
+      const q = document.getElementById('searchInput').value.trim();
+      if (!q) { showToast('⚠️ Enter a song name'); return; }
+      showToast(`🎵 Music search coming soon — try pasting a video URL`);
+    }
+
+    function showTrending() {
+      const trending = [
+        { icon: '🔥', tag: '#dance', views: '2.5B' },
+        { icon: '😂', tag: '#comedy', views: '1.8B' },
+        { icon: '⭐', tag: '#fyp', views: '1.5B' },
+        { icon: '🚀', tag: '#viral', views: '1.2B' },
+        { icon: '📈', tag: '#trending', views: '980M' },
+        { icon: '🎵', tag: '#music', views: '850M' },
+      ];
+      document.getElementById('searchResults').innerHTML = trending.map(t => `
+        <div class="s-result" onclick="document.getElementById('searchInput').value='${t.tag}'; showToast('Paste a TikTok video URL to download')">
+          <span>${t.icon}</span>
+          <span>${t.tag}</span>
+          <span style="margin-left:auto; font-size:.75rem; opacity:.5">${t.views} views</span>
+        </div>`).join('');
+    }
+
+    // ── HTML/Attr escape helpers (safe for inline onclick) ─────────────────
+    function escHtml(s) {
+      if (!s) return '';
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function escAttr(s) {
+      if (!s) return '';
+      return s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+  </script>
 </body>
 </html>
