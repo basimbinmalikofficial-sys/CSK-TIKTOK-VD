@@ -1,0 +1,1658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSK Downloader — Premium TikTok</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #c9a96e;
+      --gold-light: #e8cfa0;
+      --gold-dim: rgba(201,169,110,0.15);
+      --obsidian: #080a0f;
+      --surface: #0d1117;
+      --surface2: #131820;
+      --surface3: #1a2030;
+      --border: rgba(201,169,110,0.2);
+      --border-bright: rgba(201,169,110,0.5);
+      --text: #f0ece4;
+      --text-dim: #7a7060;
+      --red: #ff2d5e;
+      --cyan: #00d4ff;
+      --green: #00e676;
+      --radius: 16px;
+      --radius-sm: 10px;
+      --shadow: 0 32px 80px rgba(0,0,0,0.7);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--obsidian);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(201,169,110,0.06) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, rgba(0,212,255,0.04) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255,45,94,0.03) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ── AUTH OVERLAY ── */
+    #authOverlay {
+      position: fixed; inset: 0;
+      background: rgba(8,10,15,0.97);
+      z-index: 9000;
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(10px);
+      animation: fadeIn .5s ease;
+    }
+    @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+    .auth-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      width: 100%; max-width: 440px;
+      overflow: hidden;
+      box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 1px rgba(201,169,110,0.1);
+      animation: slideUp .5s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes slideUp {
+      from { opacity:0; transform: translateY(40px) scale(.96); }
+      to   { opacity:1; transform: translateY(0) scale(1); }
+    }
+
+    .auth-header {
+      padding: 28px 32px 20px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(135deg, var(--gold-dim), transparent);
+    }
+    .auth-crown { font-size: 42px; display: block; margin-bottom: 10px; filter: drop-shadow(0 0 16px rgba(201,169,110,0.5)); }
+    .auth-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.9rem; font-weight: 300;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 4px;
+    }
+    .auth-sub { font-size: .78rem; letter-spacing: .2em; text-transform: uppercase; color: var(--text-dim); }
+
+    /* Tab switcher */
+    .auth-tabs {
+      display: flex; border-bottom: 1px solid var(--border);
+    }
+    .auth-tab {
+      flex: 1; padding: 14px;
+      text-align: center; cursor: pointer;
+      font-size: .82rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-dim);
+      transition: all .3s;
+      border-bottom: 2px solid transparent;
+    }
+    .auth-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    .auth-body { padding: 28px 32px; }
+
+    /* Auth form panels */
+    .auth-panel { display: none; animation: fadeUp .35s ease; }
+    .auth-panel.active { display: block; }
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(10px); }
+      to { opacity:1; transform:translateY(0); }
+    }
+
+    .auth-field { margin-bottom: 16px; }
+    .auth-label {
+      display: block; font-size: .75rem; letter-spacing: .15em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 6px;
+    }
+    .auth-input-wrap { position: relative; }
+    .auth-input-icon {
+      position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+      font-size: 15px; pointer-events: none;
+    }
+    .auth-input {
+      width: 100%; padding: 12px 14px 12px 42px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px; outline: none;
+      transition: all .3s;
+    }
+    .auth-input:focus {
+      border-color: var(--gold);
+      background: var(--surface3);
+      box-shadow: 0 0 0 3px rgba(201,169,110,.08);
+    }
+    .auth-input::placeholder { color: var(--text-dim); }
+
+    /* toggle password */
+    .pass-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; font-size: 16px; color: var(--text-dim);
+      transition: color .2s; background: none; border: none;
+    }
+    .pass-toggle:hover { color: var(--gold); }
+
+    /* type selector (email vs phone) */
+    .type-selector {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .type-btn {
+      flex: 1; padding: 9px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); cursor: pointer;
+      font-size: .78rem; color: var(--text-dim); transition: all .3s;
+      font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+    }
+    .type-btn.active { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+
+    .auth-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--gold), #a07840);
+      border: none; border-radius: var(--radius-sm);
+      color: var(--obsidian); font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      letter-spacing: .05em; text-transform: uppercase;
+      transition: all .3s; margin-top: 4px;
+    }
+    .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(201,169,110,.35); }
+    .auth-btn:active { transform: translateY(0); }
+    .auth-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+    .auth-error {
+      margin-bottom: 14px; padding: 10px 14px;
+      background: rgba(255,45,94,.08); border: 1px solid rgba(255,45,94,.3);
+      border-radius: var(--radius-sm); color: #ff8a8a;
+      font-size: .82rem; display: none; animation: fadeUp .3s ease;
+    }
+    .auth-success {
+      margin-bottom: 14px; padding: 10px 14px;
+      background: rgba(0,230,118,.08); border: 1px solid rgba(0,230,118,.3);
+      border-radius: var(--radius-sm); color: #00e676;
+      font-size: .82rem; display: none; animation: fadeUp .3s ease;
+    }
+
+    .auth-divider {
+      text-align: center; margin: 16px 0;
+      font-size: .72rem; letter-spacing: .1em; color: var(--text-dim);
+      text-transform: uppercase; position: relative;
+    }
+    .auth-divider::before, .auth-divider::after {
+      content: ''; position: absolute; top: 50%;
+      width: 38%; height: 1px;
+      background: var(--border);
+    }
+    .auth-divider::before { left: 0; }
+    .auth-divider::after { right: 0; }
+
+    /* ── USER NAV BAR ── */
+    .user-bar {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 500;
+      background: rgba(13,17,23,0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      padding: 10px 20px;
+      align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .user-bar.visible { display: flex; }
+    .user-info {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .user-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #a07840);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; font-weight: 600; color: var(--obsidian);
+      flex-shrink: 0; border: 1px solid var(--gold);
+    }
+    .user-name { font-size: .85rem; color: var(--text); font-weight: 500; }
+    .user-id { font-size: .7rem; color: var(--text-dim); }
+    .user-bar-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-logout {
+      padding: 7px 14px; border-radius: 100px;
+      background: rgba(255,45,94,.1); border: 1px solid rgba(255,45,94,.3);
+      color: #ff8a8a; font-size: .75rem; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all .3s;
+    }
+    .btn-logout:hover { background: rgba(255,45,94,.2); }
+    .btn-profile {
+      padding: 7px 14px; border-radius: 100px;
+      background: var(--gold-dim); border: 1px solid var(--border);
+      color: var(--gold); font-size: .75rem; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all .3s;
+    }
+    .btn-profile:hover { border-color: var(--gold); }
+
+    /* ── PROFILE MODAL ── */
+    #profileModal {
+      display: none; position: fixed; inset: 0;
+      z-index: 8000; background: rgba(8,10,15,0.85);
+      align-items: center; justify-content: center;
+      padding: 20px; backdrop-filter: blur(8px);
+    }
+    #profileModal.open { display: flex; }
+    .profile-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 20px; width: 100%; max-width: 420px;
+      max-height: 85vh; overflow-y: auto;
+      box-shadow: var(--shadow);
+      animation: slideUp .4s cubic-bezier(.34,1.56,.64,1);
+    }
+    .profile-header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      background: var(--gold-dim);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .profile-header-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.3rem;
+      color: var(--gold-light);
+    }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--surface2); border: 1px solid var(--border);
+      color: var(--text-dim); cursor: pointer; font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .3s; font-family: 'DM Sans', sans-serif;
+    }
+    .modal-close:hover { border-color: var(--red); color: var(--red); }
+    .profile-body { padding: 24px; }
+    .profile-avatar-big {
+      width: 70px; height: 70px; border-radius: 50%; margin: 0 auto 16px;
+      background: linear-gradient(135deg, var(--gold), #a07840);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 600; color: var(--obsidian);
+      border: 2px solid var(--gold);
+    }
+    .profile-stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 10px; margin: 16px 0;
+    }
+    .profile-stat {
+      padding: 12px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); text-align: center;
+    }
+    .profile-stat-num {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.5rem;
+      color: var(--gold); line-height: 1;
+    }
+    .profile-stat-label { font-size: .7rem; color: var(--text-dim); letter-spacing: .1em; text-transform: uppercase; margin-top: 4px; }
+    .profile-info-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: .85rem;
+    }
+    .profile-info-row:last-child { border-bottom: none; }
+    .profile-info-icon { font-size: 16px; width: 24px; flex-shrink: 0; }
+    .profile-info-label { color: var(--text-dim); font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; }
+    .profile-info-value { color: var(--text); }
+
+    /* ── MAIN APP (hidden until logged in) ── */
+    #mainApp {
+      display: none;
+      padding-top: 60px;
+    }
+    #mainApp.visible { display: block; }
+
+    /* ── Existing styles from original ── */
+    .theme-toggle {
+      position: fixed; top: 14px; right: 16px; z-index: 600;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; transition: all .3s;
+      backdrop-filter: blur(12px);
+    }
+    .theme-toggle:hover { border-color: var(--gold); transform: rotate(20deg); }
+
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: 780px;
+      margin: 0 auto;
+      padding: clamp(24px, 5vw, 60px) clamp(16px, 4vw, 40px);
+    }
+
+    .header {
+      text-align: center; padding-bottom: clamp(28px, 5vh, 52px);
+      animation: fadeUp .8s ease both;
+    }
+    .crown {
+      font-size: clamp(40px, 10vw, 64px); display: block; margin-bottom: 16px;
+      animation: float 4s ease-in-out infinite;
+      filter: drop-shadow(0 0 20px rgba(201,169,110,0.5));
+    }
+    @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+    .brand {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(2.2rem, 7vw, 3.8rem); font-weight: 300;
+      letter-spacing: .05em;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold), #a07840);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1; margin-bottom: 8px;
+    }
+    .tagline {
+      font-size: clamp(.8rem, 2.5vw, .95rem); letter-spacing: .25em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: 20px;
+    }
+    .badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .badge {
+      padding: 5px 14px; border-radius: 100px;
+      font-size: .72rem; letter-spacing: .1em; text-transform: uppercase;
+      border: 1px solid var(--border); color: var(--text-dim); background: var(--gold-dim);
+    }
+    .badge.gold { border-color: var(--gold); color: var(--gold); }
+    .stats-row { display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; }
+    .stat-pill {
+      padding: 6px 16px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 100px; font-size: .78rem; color: var(--gold);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: clamp(20px,4vh,36px) 0; animation: fadeUp .9s ease both;
+    }
+    .divider::before, .divider::after {
+      content: ''; flex: 1; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+    .divider-icon { color: var(--gold); font-size: 14px; letter-spacing: 4px; }
+    .card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: clamp(20px, 4vw, 36px);
+      margin-bottom: 16px; transition: border-color .3s; animation: fadeUp 1s ease both;
+    }
+    .card:hover { border-color: var(--border-bright); }
+    .card-title {
+      font-family: 'Cormorant Garamond', serif; font-size: 1.15rem; font-weight: 600;
+      color: var(--gold-light); letter-spacing: .05em; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .input-wrap { flex: 1; min-width: 200px; position: relative; }
+    .input-wrap input {
+      width: 100%; padding: 14px 18px 14px 46px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: clamp(13px, 3.5vw, 15px);
+      transition: all .3s; outline: none;
+    }
+    .input-wrap input:focus {
+      border-color: var(--gold); background: var(--surface3);
+      box-shadow: 0 0 0 4px rgba(201,169,110,.08), 0 0 20px rgba(201,169,110,.1);
+    }
+    .input-wrap input::placeholder { color: var(--text-dim); }
+    .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 16px; pointer-events: none; }
+    .btn-primary {
+      padding: 14px clamp(20px, 5vw, 32px);
+      background: linear-gradient(135deg, var(--gold), #a07840);
+      border: none; border-radius: var(--radius-sm);
+      color: var(--obsidian); font-family: 'DM Sans', sans-serif;
+      font-size: clamp(13px, 3.5vw, 15px); font-weight: 600; cursor: pointer;
+      letter-spacing: .05em; text-transform: uppercase;
+      transition: all .3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+      white-space: nowrap; min-width: 120px;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201,169,110,0.35); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-secondary {
+      padding: 10px 16px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text-dim);
+      font-family: 'DM Sans', sans-serif; font-size: clamp(12px, 3vw, 13px);
+      cursor: pointer; transition: all .3s; display: flex; align-items: center; gap: 6px;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+    .btn-ghost {
+      padding: 8px 14px; background: transparent; border: 1px solid var(--border);
+      border-radius: 100px; color: var(--text-dim); font-size: 12px; cursor: pointer;
+      transition: all .3s; display: flex; align-items: center; gap: 5px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+    .quick-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .loader-wrap { display: none; text-align: center; padding: 40px 0; }
+    .loader-ring {
+      width: 48px; height: 48px; margin: 0 auto 16px;
+      border: 3px solid var(--surface3);
+      border-top: 3px solid var(--gold); border-right: 3px solid var(--red);
+      border-radius: 50%; animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: .85rem; letter-spacing: .15em; text-transform: uppercase; color: var(--text-dim); }
+    .loader-dots::after {
+      content: ''; animation: dots 1.5s steps(4, end) infinite;
+    }
+    @keyframes dots { 0%,20% { content: ''; } 40% { content: '.'; } 60% { content: '..'; } 80%,100% { content: '...'; } }
+    .result-card {
+      display: none; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
+      animation: fadeUp .5s ease both;
+    }
+    .result-header {
+      padding: 14px 20px; background: linear-gradient(90deg, var(--gold-dim), transparent);
+      border-bottom: 1px solid var(--border); font-size: .75rem; letter-spacing: .2em;
+      text-transform: uppercase; color: var(--gold);
+    }
+    .result-body { padding: clamp(16px, 3vw, 28px); }
+    .result-inner { display: flex; gap: clamp(16px, 3vw, 28px); flex-wrap: wrap; }
+    .thumb-wrap { flex: 0 0 auto; width: clamp(120px, 30%, 180px); align-self: flex-start; }
+    .thumb-wrap img {
+      width: 100%; border-radius: 12px; border: 1px solid var(--border);
+      box-shadow: 0 20px 50px rgba(0,0,0,.5); display: block;
+    }
+    .result-info { flex: 1; min-width: 200px; }
+    .video-title {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(1.1rem, 3.5vw, 1.35rem);
+      font-weight: 600; color: var(--text); line-height: 1.4; margin-bottom: 12px; word-break: break-word;
+    }
+    .meta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+    .meta-item {
+      display: flex; align-items: center; gap: 5px; font-size: .8rem; color: var(--text-dim);
+      padding: 4px 10px; background: var(--surface2); border-radius: 100px; border: 1px solid var(--border);
+    }
+    .quality-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
+    .quality-label { font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-dim); white-space: nowrap; }
+    .quality-select {
+      flex: 1; min-width: 140px; padding: 9px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; cursor: pointer;
+      transition: border-color .3s;
+    }
+    .quality-select:focus { border-color: var(--gold); }
+    .action-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .action-btn {
+      flex: 1 1 100px; padding: clamp(10px,2.5vw,12px) clamp(12px,3vw,18px);
+      border: none; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif;
+      font-size: clamp(12px, 3vw, 14px); font-weight: 500; cursor: pointer; transition: all .3s;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      color: white; min-width: 90px;
+    }
+    .btn-dl { background: linear-gradient(135deg, var(--gold), #a07840); color: var(--obsidian); }
+    .btn-preview { background: var(--surface3); border: 1px solid var(--border); color: var(--text); }
+    .btn-copy { background: var(--surface3); border: 1px solid var(--border); color: var(--text); }
+    .btn-save { background: var(--surface3); border: 1px solid var(--border); color: var(--text); }
+    .btn-dl:hover { box-shadow: 0 8px 24px rgba(201,169,110,.4); transform: translateY(-1px); }
+    .btn-preview:hover, .btn-copy:hover, .btn-save:hover { border-color: var(--gold); color: var(--gold); }
+    .social-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+    .social-btn {
+      flex: 1 1 80px; padding: 9px 12px; border: none; border-radius: var(--radius-sm);
+      font-size: clamp(11px, 2.8vw, 13px); cursor: pointer; transition: all .3s;
+      display: flex; align-items: center; justify-content: center; gap: 5px;
+      color: white; font-family: 'DM Sans', sans-serif; opacity: .85;
+    }
+    .social-btn:hover { opacity: 1; transform: translateY(-1px); }
+    .s-wa { background: #128C7E; } .s-tg { background: #2AABEE; }
+    .s-fb { background: #1877F2; } .s-tw { background: #1DA1F2; }
+    .trimmer {
+      padding: 16px; background: var(--surface2); border-radius: var(--radius-sm);
+      border: 1px solid var(--border); margin-bottom: 16px;
+    }
+    .trimmer-title { font-size: .78rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+    .range-group { margin-bottom: 8px; }
+    .range-label { font-size: .75rem; color: var(--text-dim); margin-bottom: 4px; }
+    .trim-range {
+      width: 100%; height: 4px; -webkit-appearance: none; appearance: none;
+      background: var(--surface3); border-radius: 2px; outline: none; cursor: pointer;
+    }
+    .trim-range::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 18px; height: 18px;
+      background: var(--gold); border-radius: 50%; cursor: pointer;
+      box-shadow: 0 0 8px rgba(201,169,110,.5);
+    }
+    .trim-values { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: .78rem; color: var(--text-dim); }
+    .btn-audio {
+      width: 100%; padding: 12px; margin-top: 12px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none; border-radius: var(--radius-sm); color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500;
+      cursor: pointer; transition: all .3s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-audio:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(102,126,234,.4); }
+    .error-box {
+      display: none; padding: 20px; border-radius: var(--radius-sm);
+      background: rgba(255,45,94,.08); border: 1px solid rgba(255,45,94,.3);
+      color: #ff8a8a; font-size: .9rem; line-height: 1.5; margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .history-box {
+      display: none; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .history-header {
+      padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
+      background: var(--gold-dim); border-bottom: 1px solid var(--border);
+    }
+    .history-header span { font-size: .78rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); }
+    .history-item {
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      font-size: .83rem; color: var(--text-dim); cursor: pointer;
+      transition: all .25s; word-break: break-all;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item:hover { background: var(--gold-dim); color: var(--gold); padding-left: 26px; }
+    .history-empty { padding: 24px; text-align: center; color: var(--text-dim); font-size: .85rem; }
+    .batch-box {
+      display: none; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: clamp(16px, 3vw, 28px); margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .batch-box textarea {
+      width: 100%; padding: 14px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); color: var(--text); font-family: 'DM Sans', sans-serif;
+      font-size: 13px; resize: vertical; outline: none; margin: 12px 0;
+      transition: border-color .3s; min-height: 100px;
+    }
+    .batch-box textarea:focus { border-color: var(--gold); }
+    .search-box {
+      display: none; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: clamp(16px, 3vw, 24px); margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .search-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .search-tab {
+      padding: 7px 16px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 100px; font-size: .78rem; color: var(--text-dim); cursor: pointer;
+      transition: all .3s; letter-spacing: .05em; font-family: 'DM Sans', sans-serif;
+    }
+    .search-tab.active { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+    .search-input-wrap { position: relative; }
+    .search-input-wrap input {
+      width: 100%; padding: 12px 18px 12px 42px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: var(--radius-sm); color: var(--text);
+      font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: all .3s;
+    }
+    .search-input-wrap input:focus { border-color: var(--gold); }
+    .search-input-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+    .search-results { margin-top: 12px; }
+    .s-result {
+      padding: 12px 16px; border-radius: var(--radius-sm); background: var(--surface2);
+      border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer; transition: all .25s;
+      font-size: .85rem; color: var(--text-dim); display: flex; align-items: center; gap: 10px;
+    }
+    .s-result:hover { border-color: var(--gold); color: var(--gold); background: var(--gold-dim); }
+    .fav-box {
+      display: none; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); overflow: hidden; margin-bottom: 16px;
+      animation: fadeUp .4s ease both;
+    }
+    .fav-header {
+      padding: 14px 20px; display: flex; justify-content: space-between; align-items: center;
+      background: var(--gold-dim); border-bottom: 1px solid var(--border);
+    }
+    .fav-header span { font-size: .78rem; letter-spacing: .15em; text-transform: uppercase; color: var(--gold); }
+    .fav-item {
+      padding: 12px 20px; border-bottom: 1px solid var(--border);
+      font-size: .83rem; color: var(--text-dim); cursor: pointer;
+      transition: all .25s; word-break: break-all;
+    }
+    .fav-item:last-child { border-bottom: none; }
+    .fav-item:hover { background: var(--gold-dim); color: var(--gold); padding-left: 26px; }
+    .fav-empty { padding: 24px; text-align: center; color: var(--text-dim); font-size: .85rem; }
+    .counter-card {
+      text-align: center; padding: clamp(20px, 4vw, 36px); background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 16px;
+      animation: fadeUp 1.1s ease both;
+    }
+    .counter-num {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 300;
+      background: linear-gradient(135deg, var(--gold-light), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      line-height: 1; margin-bottom: 6px;
+    }
+    .counter-label { font-size: .75rem; letter-spacing: .25em; text-transform: uppercase; color: var(--text-dim); }
+    .features {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 8px; margin-bottom: 16px; animation: fadeUp 1.2s ease both;
+    }
+    .feat {
+      padding: 10px 12px; background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius-sm); font-size: .75rem; color: var(--text-dim);
+      display: flex; align-items: center; gap: 7px; transition: all .3s;
+    }
+    .feat:hover { border-color: var(--gold); color: var(--gold); }
+    .feat-icon { font-size: 14px; flex-shrink: 0; }
+    .footer {
+      text-align: center; padding: 24px 0;
+      font-size: .75rem; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--text-dim); animation: fadeUp 1.3s ease both;
+    }
+    .footer span { color: var(--gold); }
+    .toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1px solid var(--gold);
+      color: var(--gold); padding: 12px 24px; border-radius: 100px;
+      font-size: .83rem; letter-spacing: .05em;
+      transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .4s;
+      z-index: 9999; pointer-events: none; opacity: 0;
+      white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    body.light {
+      --obsidian: #f5f0e8; --surface: #ffffff; --surface2: #f0ebe0; --surface3: #e8e0d0;
+      --border: rgba(150,110,50,0.2); --border-bright: rgba(150,110,50,0.5);
+      --text: #1a1510; --text-dim: #8a7860; --gold: #8a5c20;
+      --gold-light: #6b4010; --gold-dim: rgba(138,92,32,0.1);
+    }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--surface); }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+    @media (max-width: 480px) {
+      .btn-primary { width: 100%; }
+      .input-row { flex-direction: column; }
+      .result-inner { flex-direction: column; align-items: center; }
+      .thumb-wrap { width: 160px; }
+      .action-btn { min-width: 70px; }
+      .auth-body { padding: 20px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ AUTH OVERLAY ══════════════════════════════════════════════════════════ -->
+<div id="authOverlay">
+  <div class="auth-box">
+
+    <div class="auth-header">
+      <span class="auth-crown">♛</span>
+      <div class="auth-title">CSK Downloader</div>
+      <div class="auth-sub">Premium TikTok — No Watermark</div>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">🔑 Login</div>
+      <div class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">✨ Register</div>
+    </div>
+
+    <div class="auth-body">
+
+      <!-- LOGIN PANEL -->
+      <div class="auth-panel active" id="panelLogin">
+        <div class="auth-error" id="loginError"></div>
+        <div class="auth-success" id="loginSuccess"></div>
+
+        <div class="type-selector">
+          <button class="type-btn active" id="loginEmailBtn" onclick="setLoginType('email')">📧 Email</button>
+          <button class="type-btn" id="loginPhoneBtn" onclick="setLoginType('phone')">📱 Mobile</button>
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label" id="loginIdentLabel">Email Address</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon" id="loginIdentIcon">📧</span>
+            <input class="auth-input" type="text" id="loginIdent" placeholder="you@example.com" autocomplete="username">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">🔒</span>
+            <input class="auth-input" type="password" id="loginPass" placeholder="Enter your password" autocomplete="current-password">
+            <button class="pass-toggle" onclick="togglePass('loginPass', this)">👁</button>
+          </div>
+        </div>
+
+        <button class="auth-btn" onclick="doLogin()">🔑 Login to CSK</button>
+
+        <div class="auth-divider">or</div>
+        <p style="text-align:center; font-size:.8rem; color:var(--text-dim)">
+          Don't have an account?
+          <span style="color:var(--gold); cursor:pointer;" onclick="switchAuthTab('register')">Register here →</span>
+        </p>
+      </div>
+
+      <!-- REGISTER PANEL -->
+      <div class="auth-panel" id="panelRegister">
+        <div class="auth-error" id="regError"></div>
+        <div class="auth-success" id="regSuccess"></div>
+
+        <div class="type-selector">
+          <button class="type-btn active" id="regEmailBtn" onclick="setRegType('email')">📧 Email</button>
+          <button class="type-btn" id="regPhoneBtn" onclick="setRegType('phone')">📱 Mobile</button>
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label">Display Name</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">👤</span>
+            <input class="auth-input" type="text" id="regName" placeholder="Your name" autocomplete="name">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label" id="regIdentLabel">Email Address</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon" id="regIdentIcon">📧</span>
+            <input class="auth-input" type="text" id="regIdent" placeholder="you@example.com" autocomplete="username">
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">🔒</span>
+            <input class="auth-input" type="password" id="regPass" placeholder="Min 6 characters" autocomplete="new-password">
+            <button class="pass-toggle" onclick="togglePass('regPass', this)">👁</button>
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label class="auth-label">Confirm Password</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">🔑</span>
+            <input class="auth-input" type="password" id="regPassConfirm" placeholder="Repeat password" autocomplete="new-password">
+            <button class="pass-toggle" onclick="togglePass('regPassConfirm', this)">👁</button>
+          </div>
+        </div>
+
+        <button class="auth-btn" onclick="doRegister()">✨ Create Account</button>
+
+        <div class="auth-divider">or</div>
+        <p style="text-align:center; font-size:.8rem; color:var(--text-dim)">
+          Already have an account?
+          <span style="color:var(--gold); cursor:pointer;" onclick="switchAuthTab('login')">Login here →</span>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ USER NAV BAR ══════════════════════════════════════════════════════════ -->
+<div class="user-bar" id="userBar">
+  <div class="user-info">
+    <div class="user-avatar" id="navAvatar">?</div>
+    <div>
+      <div class="user-name" id="navName">User</div>
+      <div class="user-id" id="navId">—</div>
+    </div>
+  </div>
+  <div class="user-bar-actions">
+    <button class="btn-profile" onclick="openProfile()">👤 Profile</button>
+    <button class="btn-logout" onclick="doLogout()">⬡ Logout</button>
+  </div>
+</div>
+
+<!-- ══ PROFILE MODAL ══════════════════════════════════════════════════════════ -->
+<div id="profileModal">
+  <div class="profile-box">
+    <div class="profile-header">
+      <span class="profile-header-title">👤 My Profile</span>
+      <button class="modal-close" onclick="closeProfile()">✕</button>
+    </div>
+    <div class="profile-body">
+      <div class="profile-avatar-big" id="profileAvatar">?</div>
+      <p style="text-align:center; font-family:'Cormorant Garamond',serif; font-size:1.4rem; color:var(--gold-light)" id="profileName">—</p>
+      <p style="text-align:center; font-size:.8rem; color:var(--text-dim); margin-top:4px" id="profileIdent">—</p>
+
+      <div class="profile-stat-grid" style="margin-top:20px">
+        <div class="profile-stat">
+          <div class="profile-stat-num" id="profileDlCount">0</div>
+          <div class="profile-stat-label">Downloads</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num" id="profileFavCount">0</div>
+          <div class="profile-stat-label">Favorites</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num" id="profileHistCount">0</div>
+          <div class="profile-stat-label">History</div>
+        </div>
+        <div class="profile-stat">
+          <div class="profile-stat-num" id="profileDaysSince">0</div>
+          <div class="profile-stat-label">Days Active</div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div class="profile-info-row">
+          <span class="profile-info-icon">📅</span>
+          <div>
+            <div class="profile-info-label">Member Since</div>
+            <div class="profile-info-value" id="profileJoined">—</div>
+          </div>
+        </div>
+        <div class="profile-info-row">
+          <span class="profile-info-icon">🔑</span>
+          <div>
+            <div class="profile-info-label">Account Type</div>
+            <div class="profile-info-value" id="profileType">—</div>
+          </div>
+        </div>
+        <div class="profile-info-row">
+          <span class="profile-info-icon">📱</span>
+          <div>
+            <div class="profile-info-label">Device</div>
+            <div class="profile-info-value" id="profileDevice">—</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="auth-btn" style="margin-top:20px; background:linear-gradient(135deg,var(--red),#a01030);" onclick="confirmDeleteAccount()">
+        🗑 Delete Account
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ THEME TOGGLE ══════════════════════════════════════════════════════════ -->
+<div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" id="themeBtn" style="display:none">
+  <span id="themeIcon">🌙</span>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ══ MAIN APP ══════════════════════════════════════════════════════════════ -->
+<div id="mainApp">
+  <div class="wrap">
+
+    <div class="header">
+      <span class="crown">♛</span>
+      <div class="brand">CSK Downloader</div>
+      <div class="tagline">Premium TikTok — No Watermark</div>
+      <div class="badges">
+        <span class="badge gold">⚡ Mobile Ready</span>
+        <span class="badge">HD Quality</span>
+        <span class="badge">MP3 Audio</span>
+        <span class="badge">Batch Mode</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat-pill">📊 <span id="todayStat">1,847</span> today</div>
+        <div class="stat-pill">⭐ 4.9 / 5</div>
+        <div class="stat-pill">⚡ <span id="speedStat">0.4</span>s avg</div>
+        <div class="stat-pill">🎯 <span id="totalStat">50K+</span></div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-icon">✦ ✦ ✦</span></div>
+
+    <div class="card">
+      <div class="card-title">🔗 Paste TikTok URL</div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <span class="input-icon">🎬</span>
+          <input type="text" id="videoUrl" placeholder="https://www.tiktok.com/@user/video/..." autocomplete="off">
+        </div>
+        <button class="btn-primary" onclick="processVideo()"><span>✦</span> Download</button>
+      </div>
+      <div class="quick-row">
+        <button class="btn-ghost" onclick="clearInput()">🗑 Clear</button>
+        <button class="btn-ghost" onclick="pasteFromClipboard()">📋 Paste</button>
+        <button class="btn-ghost" onclick="toggleSection('historyBox')">📜 History</button>
+        <button class="btn-ghost" onclick="toggleSection('favBox')">⭐ Favorites</button>
+        <button class="btn-ghost" onclick="toggleSection('batchBox')">📦 Batch</button>
+        <button class="btn-ghost" onclick="toggleSection('searchBox')">🔍 Search</button>
+      </div>
+    </div>
+
+    <div class="history-box" id="historyBox">
+      <div class="history-header">
+        <span>📜 Recent Downloads</span>
+        <button class="btn-ghost" onclick="clearHistory()" style="font-size:11px; padding:5px 10px;">Clear All</button>
+      </div>
+      <div id="historyList"><div class="history-empty">No download history yet</div></div>
+    </div>
+
+    <div class="fav-box" id="favBox">
+      <div class="fav-header">
+        <span>⭐ Saved Favorites</span>
+        <button class="btn-ghost" onclick="clearFavorites()" style="font-size:11px; padding:5px 10px;">Clear All</button>
+      </div>
+      <div id="favList"><div class="fav-empty">No favorites saved yet</div></div>
+    </div>
+
+    <div class="batch-box" id="batchBox">
+      <div class="card-title">📦 Batch Download</div>
+      <p style="font-size:.83rem; color:var(--text-dim); margin-bottom:4px;">Enter up to 5 TikTok URLs — one per line</p>
+      <textarea id="batchUrls" rows="5" placeholder="https://www.tiktok.com/@user/video/111&#10;https://www.tiktok.com/@user/video/222"></textarea>
+      <button class="btn-primary" style="width:100%;" onclick="processBatch()">⬇ Download All (Max 5)</button>
+    </div>
+
+    <div class="search-box" id="searchBox">
+      <div class="card-title">🔍 Explore TikTok</div>
+      <div class="search-tabs">
+        <div class="search-tab active" onclick="setSearchTab('hashtag', this)"># Hashtags</div>
+        <div class="search-tab" onclick="setSearchTab('music', this)">🎵 Music</div>
+        <div class="search-tab" onclick="setSearchTab('trending', this)">🔥 Trending</div>
+      </div>
+      <div class="search-input-wrap">
+        <span class="search-input-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search hashtags..." onkeydown="searchKeydown(event)">
+      </div>
+      <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <div class="loader-wrap" id="loaderWrap">
+      <div class="loader-ring"></div>
+      <div class="loader-text">Fetching video<span class="loader-dots"></span></div>
+    </div>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-header">✦ Video Ready to Download</div>
+      <div class="result-body">
+        <div class="result-inner" id="resultInner"></div>
+      </div>
+    </div>
+
+    <div class="divider"><span class="divider-icon">✦ ✦ ✦</span></div>
+
+    <div class="counter-card">
+      <div class="counter-num" id="globalCounter">0</div>
+      <div class="counter-label">Total Downloads</div>
+    </div>
+
+    <div class="features">
+      <div class="feat"><span class="feat-icon">⚡</span> No Watermark</div>
+      <div class="feat"><span class="feat-icon">🎥</span> HD Quality</div>
+      <div class="feat"><span class="feat-icon">📱</span> Mobile First</div>
+      <div class="feat"><span class="feat-icon">🎵</span> MP3 Audio</div>
+      <div class="feat"><span class="feat-icon">📦</span> Batch Mode</div>
+      <div class="feat"><span class="feat-icon">📜</span> History</div>
+      <div class="feat"><span class="feat-icon">⭐</span> Favorites</div>
+      <div class="feat"><span class="feat-icon">✂️</span> Trimmer</div>
+      <div class="feat"><span class="feat-icon">🌙</span> Dark / Light</div>
+      <div class="feat"><span class="feat-icon">#</span> Hashtag Search</div>
+      <div class="feat"><span class="feat-icon">🔒</span> Account System</div>
+      <div class="feat"><span class="feat-icon">📊</span> Per-Device Data</div>
+    </div>
+
+    <div class="footer"><span>⚡ CSK</span> Premium Downloader &nbsp;·&nbsp; All rights reserved</div>
+
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+//  AUTH SYSTEM — Pure localStorage, no server needed
+//  Data structure (per device/browser):
+//    csk_users          → array of {id, name, ident, identType, passHash, joinedAt}
+//    csk_session        → {userId}
+//    csk_data_{userId}  → {history, favorites, counter, dlCount, theme}
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function simpleHash(str) {
+  // Simple deterministic hash (not cryptographic — local only)
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = (h * 0x01000193) >>> 0;
+  }
+  return h.toString(16).padStart(8, '0');
+}
+
+function genId() {
+  return 'csk_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+}
+
+function getUsers() {
+  return JSON.parse(localStorage.getItem('csk_users') || '[]');
+}
+function saveUsers(arr) {
+  localStorage.setItem('csk_users', JSON.stringify(arr));
+}
+function getSession() {
+  return JSON.parse(localStorage.getItem('csk_session') || 'null');
+}
+function saveSession(s) {
+  localStorage.setItem('csk_session', JSON.stringify(s));
+}
+function getUserData(uid) {
+  return JSON.parse(localStorage.getItem('csk_data_' + uid) || JSON.stringify({
+    history: [], favorites: [], counter: 123456, dlCount: 0, theme: 'dark'
+  }));
+}
+function saveUserData(uid, data) {
+  localStorage.setItem('csk_data_' + uid, JSON.stringify(data));
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let currentUser = null;
+let userData = null;
+let loginType = 'email';
+let regType = 'email';
+let searchTabType = 'hashtag';
+
+// ── On load ───────────────────────────────────────────────────────────────────
+(function init() {
+  const sess = getSession();
+  if (sess) {
+    const users = getUsers();
+    const user = users.find(u => u.id === sess.userId);
+    if (user) {
+      loginSuccess(user);
+      return;
+    }
+  }
+  // Show auth overlay
+  document.getElementById('authOverlay').style.display = 'flex';
+})();
+
+// ── Auth UI helpers ───────────────────────────────────────────────────────────
+function switchAuthTab(tab) {
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+  clearAuthMessages();
+}
+
+function clearAuthMessages() {
+  ['loginError','loginSuccess','regError','regSuccess'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.display = 'none'; el.textContent = '';
+  });
+}
+
+function showAuthMsg(id, msg, isSuccess) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+function togglePass(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  const isText = inp.type === 'text';
+  inp.type = isText ? 'password' : 'text';
+  btn.textContent = isText ? '👁' : '🙈';
+}
+
+function setLoginType(type) {
+  loginType = type;
+  document.getElementById('loginEmailBtn').classList.toggle('active', type === 'email');
+  document.getElementById('loginPhoneBtn').classList.toggle('active', type === 'phone');
+  document.getElementById('loginIdentLabel').textContent = type === 'email' ? 'Email Address' : 'Mobile Number';
+  document.getElementById('loginIdentIcon').textContent = type === 'email' ? '📧' : '📱';
+  document.getElementById('loginIdent').placeholder = type === 'email' ? 'you@example.com' : '+92 3xx xxxxxxx';
+  document.getElementById('loginIdent').type = type === 'email' ? 'email' : 'tel';
+}
+
+function setRegType(type) {
+  regType = type;
+  document.getElementById('regEmailBtn').classList.toggle('active', type === 'email');
+  document.getElementById('regPhoneBtn').classList.toggle('active', type === 'phone');
+  document.getElementById('regIdentLabel').textContent = type === 'email' ? 'Email Address' : 'Mobile Number';
+  document.getElementById('regIdentIcon').textContent = type === 'email' ? '📧' : '📱';
+  document.getElementById('regIdent').placeholder = type === 'email' ? 'you@example.com' : '+92 3xx xxxxxxx';
+  document.getElementById('regIdent').type = type === 'email' ? 'email' : 'tel';
+}
+
+// ── Register ──────────────────────────────────────────────────────────────────
+function doRegister() {
+  clearAuthMessages();
+  const name = document.getElementById('regName').value.trim();
+  const ident = document.getElementById('regIdent').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const passConfirm = document.getElementById('regPassConfirm').value;
+
+  if (!name) return showAuthMsg('regError', '⚠️ Please enter your name');
+  if (!ident) return showAuthMsg('regError', '⚠️ Please enter ' + (regType === 'email' ? 'email' : 'mobile number'));
+
+  if (regType === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ident))
+    return showAuthMsg('regError', '⚠️ Invalid email address');
+
+  if (regType === 'phone' && !/^[\+\d\s\-]{7,15}$/.test(ident.replace(/\s/g,'')))
+    return showAuthMsg('regError', '⚠️ Invalid mobile number');
+
+  if (pass.length < 6) return showAuthMsg('regError', '⚠️ Password must be at least 6 characters');
+  if (pass !== passConfirm) return showAuthMsg('regError', '⚠️ Passwords do not match');
+
+  const users = getUsers();
+  if (users.find(u => u.ident.toLowerCase() === ident.toLowerCase()))
+    return showAuthMsg('regError', '⚠️ This ' + (regType === 'email' ? 'email' : 'number') + ' is already registered');
+
+  const newUser = {
+    id: genId(),
+    name,
+    ident,
+    identType: regType,
+    passHash: simpleHash(pass + ident),
+    joinedAt: new Date().toISOString()
+  };
+  users.push(newUser);
+  saveUsers(users);
+
+  showAuthMsg('regSuccess', '✅ Account created! Logging you in…');
+  setTimeout(() => loginSuccess(newUser), 900);
+}
+
+// ── Login ──────────────────────────────────────────────────────────────────────
+function doLogin() {
+  clearAuthMessages();
+  const ident = document.getElementById('loginIdent').value.trim();
+  const pass = document.getElementById('loginPass').value;
+
+  if (!ident) return showAuthMsg('loginError', '⚠️ Please enter your ' + (loginType === 'email' ? 'email' : 'mobile number'));
+  if (!pass) return showAuthMsg('loginError', '⚠️ Please enter password');
+
+  const users = getUsers();
+  const user = users.find(u => u.ident.toLowerCase() === ident.toLowerCase());
+  if (!user) return showAuthMsg('loginError', '❌ No account found with this ' + (loginType === 'email' ? 'email' : 'number'));
+
+  const hash = simpleHash(pass + user.ident);
+  if (hash !== user.passHash) return showAuthMsg('loginError', '❌ Wrong password');
+
+  showAuthMsg('loginSuccess', '✅ Welcome back, ' + user.name + '!');
+  setTimeout(() => loginSuccess(user), 700);
+}
+
+// ── After successful login ─────────────────────────────────────────────────────
+function loginSuccess(user) {
+  currentUser = user;
+  userData = getUserData(user.id);
+  saveSession({ userId: user.id });
+
+  // Hide auth, show app
+  document.getElementById('authOverlay').style.display = 'none';
+  document.getElementById('mainApp').classList.add('visible');
+  document.getElementById('userBar').classList.add('visible');
+  document.getElementById('themeBtn').style.display = 'flex';
+
+  // Populate nav bar
+  document.getElementById('navAvatar').textContent = user.name.charAt(0).toUpperCase();
+  document.getElementById('navName').textContent = user.name;
+  document.getElementById('navId').textContent = user.identType === 'email' ? '📧 ' + user.ident : '📱 ' + user.ident;
+
+  // Apply saved theme
+  if (userData.theme === 'light') {
+    document.body.classList.add('light');
+    document.getElementById('themeIcon').textContent = '☀️';
+  }
+
+  // Init app with user data
+  history_ = userData.history || [];
+  favorites_ = userData.favorites || [];
+  counter_ = userData.counter || 123456;
+
+  document.getElementById('globalCounter').textContent = counter_.toLocaleString();
+  document.getElementById('totalStat').textContent = counter_.toLocaleString();
+  renderHistory();
+  renderFavorites();
+  showTrending();
+  showToast('👋 Welcome, ' + user.name + '!');
+}
+
+// ── Logout ─────────────────────────────────────────────────────────────────────
+function doLogout() {
+  if (!confirm('Logout from CSK Downloader?')) return;
+  saveCurrentUserData();
+  localStorage.removeItem('csk_session');
+  currentUser = null; userData = null;
+  document.getElementById('mainApp').classList.remove('visible');
+  document.getElementById('userBar').classList.remove('visible');
+  document.getElementById('themeBtn').style.display = 'none';
+  document.getElementById('authOverlay').style.display = 'flex';
+  document.body.classList.remove('light');
+  document.getElementById('themeIcon').textContent = '🌙';
+  clearAuthMessages();
+  showToast('👋 Logged out');
+}
+
+function saveCurrentUserData() {
+  if (!currentUser) return;
+  userData.history = history_;
+  userData.favorites = favorites_;
+  userData.counter = counter_;
+  saveUserData(currentUser.id, userData);
+}
+
+// ── Delete Account ─────────────────────────────────────────────────────────────
+function confirmDeleteAccount() {
+  if (!confirm('⚠️ Delete your account and ALL data? This cannot be undone.')) return;
+  if (!currentUser) return;
+  // Remove user data
+  localStorage.removeItem('csk_data_' + currentUser.id);
+  // Remove from users list
+  const users = getUsers().filter(u => u.id !== currentUser.id);
+  saveUsers(users);
+  localStorage.removeItem('csk_session');
+  closeProfile();
+  doLogout();
+  showToast('🗑 Account deleted');
+}
+
+// ── Profile Modal ──────────────────────────────────────────────────────────────
+function openProfile() {
+  if (!currentUser) return;
+  const ud = getUserData(currentUser.id);
+
+  document.getElementById('profileAvatar').textContent = currentUser.name.charAt(0).toUpperCase();
+  document.getElementById('profileName').textContent = currentUser.name;
+  document.getElementById('profileIdent').textContent = (currentUser.identType === 'email' ? '📧 ' : '📱 ') + currentUser.ident;
+  document.getElementById('profileDlCount').textContent = ud.dlCount || 0;
+  document.getElementById('profileFavCount').textContent = (ud.favorites || []).length;
+  document.getElementById('profileHistCount').textContent = (ud.history || []).length;
+
+  const joined = new Date(currentUser.joinedAt);
+  const days = Math.floor((Date.now() - joined.getTime()) / 86400000);
+  document.getElementById('profileDaysSince').textContent = days;
+  document.getElementById('profileJoined').textContent = joined.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  document.getElementById('profileType').textContent = currentUser.identType === 'email' ? '📧 Email Account' : '📱 Mobile Account';
+  document.getElementById('profileDevice').textContent = navigator.userAgent.includes('Mobile') ? '📱 Mobile' : '🖥 Desktop';
+
+  document.getElementById('profileModal').classList.add('open');
+}
+
+function closeProfile() {
+  document.getElementById('profileModal').classList.remove('open');
+}
+
+// Close profile modal on backdrop click
+document.getElementById('profileModal').addEventListener('click', function(e) {
+  if (e.target === this) closeProfile();
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+//  MAIN APP LOGIC (original, now user-data aware)
+// ════════════════════════════════════════════════════════════════════════════
+
+let history_ = [];
+let favorites_ = [];
+let counter_ = 123456;
+
+// ── Theme ──────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  document.body.classList.toggle('light');
+  const isLight = document.body.classList.contains('light');
+  document.getElementById('themeIcon').textContent = isLight ? '☀️' : '🌙';
+  if (currentUser && userData) {
+    userData.theme = isLight ? 'light' : 'dark';
+    saveCurrentUserData();
+  }
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  const open = el.style.display !== 'none' && el.style.display !== '';
+  el.style.display = open ? 'none' : 'block';
+}
+
+function clearInput() {
+  document.getElementById('videoUrl').value = '';
+  hideResult();
+}
+
+async function pasteFromClipboard() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (text) {
+      document.getElementById('videoUrl').value = text.trim();
+      showToast('📋 Pasted from clipboard');
+    } else showToast('Clipboard is empty');
+  } catch { showToast('Please paste manually (Ctrl+V)'); }
+}
+
+function hideResult() {
+  document.getElementById('resultCard').style.display = 'none';
+  document.getElementById('errorBox').style.display = 'none';
+}
+
+function isTikTokUrl(url) {
+  return /tiktok\.com/.test(url) || /vm\.tiktok\.com/.test(url) || /vt\.tiktok\.com/.test(url);
+}
+
+async function processVideo() {
+  const url = document.getElementById('videoUrl').value.trim();
+  if (!url) { showToast('⚠️ Please enter a TikTok URL'); return; }
+  if (!isTikTokUrl(url)) { showError('❌ Please enter a valid TikTok URL'); return; }
+  showLoader(true); hideResult();
+  try {
+    const data = await fetchTikTokData(url);
+    showLoader(false);
+    if (data) {
+      displayResult(data);
+      addToHistory(data);
+      incrementCounter();
+    } else {
+      showError('❌ Could not fetch video. Make sure the video is public.');
+    }
+  } catch (err) {
+    showLoader(false);
+    showError('❌ Error: ' + err.message);
+  }
+}
+
+async function fetchTikTokData(url) {
+  const res = await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`);
+  const json = await res.json();
+  if (json.code === 0 && json.data) {
+    const d = json.data;
+    return {
+      title: d.title || 'TikTok Video',
+      play: d.play || d.wmplay || '',
+      wmplay: d.wmplay || '',
+      music: d.music || '',
+      cover: d.cover || '',
+      duration: d.duration || 0,
+      author: d.author?.unique_id || 'tiktok_user',
+      views: d.play_count ?? 'N/A',
+      likes: d.digg_count ?? 'N/A',
+      url: url
+    };
+  }
+  return null;
+}
+
+function showLoader(on) {
+  document.getElementById('loaderWrap').style.display = on ? 'block' : 'none';
+}
+
+function showError(msg) {
+  const eb = document.getElementById('errorBox');
+  eb.textContent = msg;
+  eb.style.display = 'block';
+}
+
+function incrementCounter() {
+  counter_++;
+  if (currentUser && userData) {
+    userData.dlCount = (userData.dlCount || 0) + 1;
+    userData.counter = counter_;
+    saveCurrentUserData();
+  }
+  document.getElementById('globalCounter').textContent = counter_.toLocaleString();
+  document.getElementById('totalStat').textContent = counter_.toLocaleString();
+  document.getElementById('speedStat').textContent = (Math.random() * .4 + .2).toFixed(1);
+}
+
+function fmtNum(n) {
+  if (n === 'N/A' || n == null) return 'N/A';
+  n = parseInt(n);
+  if (isNaN(n)) return 'N/A';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function safeUrl(u, base) {
+  if (!u) return '';
+  return u.startsWith('http') ? u : base + u;
+}
+
+function displayResult(data) {
+  const base = 'https://www.tikwm.com';
+  const videoUrl = safeUrl(data.play, base);
+  const musicUrl = safeUrl(data.music, base);
+  const cover = data.cover || 'https://placehold.co/180x300/131820/c9a96e?text=No+Cover';
+  const authorSafe = escHtml(data.author);
+  const titleSafe = escHtml(data.title.substring(0, 120)) + (data.title.length > 120 ? '…' : '');
+  const videoUrlSafe = escAttr(videoUrl);
+  const musicUrlSafe = escAttr(musicUrl);
+  const trimmerHtml = data.duration > 0 ? buildTrimmer(data.duration) : '';
+
+  document.getElementById('resultInner').innerHTML = `
+    <div class="thumb-wrap">
+      <img src="${escAttr(cover)}" alt="Thumbnail"
+        onerror="this.src='https://placehold.co/180x300/131820/c9a96e?text=No+Cover'">
+    </div>
+    <div class="result-info">
+      <div class="video-title">${titleSafe}</div>
+      <div class="meta-row">
+        <div class="meta-item">👤 @${authorSafe}</div>
+        <div class="meta-item">👁 ${fmtNum(data.views)}</div>
+        <div class="meta-item">❤️ ${fmtNum(data.likes)}</div>
+        <div class="meta-item">⏱ ${data.duration}s</div>
+      </div>
+      ${trimmerHtml}
+      <div class="quality-row">
+        <span class="quality-label">Quality</span>
+        <select class="quality-select" id="qualitySelect">
+          <option value="hd">HD — Best Quality</option>
+          <option value="sd">SD — Smaller File</option>
+          <option value="audio">Audio Only (MP3)</option>
+        </select>
+      </div>
+      <div class="action-row">
+        <button class="action-btn btn-dl" onclick="downloadWithQuality('${videoUrlSafe}','${authorSafe}','${musicUrlSafe}')">⬇ Download</button>
+        <button class="action-btn btn-preview" onclick="window.open('${videoUrlSafe}','_blank')">👁 Preview</button>
+        <button class="action-btn btn-copy" onclick="copyLink('${escAttr(data.url)}')">🔗 Copy</button>
+        <button class="action-btn btn-save" onclick="addToFavorites('${escAttr(data.url)}','${escAttr(data.title.substring(0,80))}')">⭐ Save</button>
+      </div>
+      <div class="social-row">
+        <button class="social-btn s-wa" onclick="shareWA('${escAttr(data.url)}')">📱 WhatsApp</button>
+        <button class="social-btn s-tg" onclick="shareTG('${escAttr(data.url)}')">✈️ Telegram</button>
+        <button class="social-btn s-fb" onclick="shareFB('${escAttr(data.url)}')">📘 Facebook</button>
+        <button class="social-btn s-tw" onclick="shareTW('${escAttr(data.url)}')">🐦 Twitter</button>
+      </div>
+      ${musicUrl ? `<button class="btn-audio" onclick="dlVideo('${musicUrlSafe}','CSK_Audio_${authorSafe}.mp3')">🎵 Download Audio (MP3)</button>` : ''}
+    </div>`;
+  document.getElementById('resultCard').style.display = 'block';
+  document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function buildTrimmer(dur) {
+  return `<div class="trimmer">
+    <div class="trimmer-title">✂️ Video Trimmer (Preview Only)</div>
+    <div class="range-group">
+      <div class="range-label">Start time: <strong id="startVal">0</strong>s</div>
+      <input type="range" class="trim-range" id="trimStart" min="0" max="${dur}" value="0" oninput="syncTrimmer()">
+    </div>
+    <div class="range-group">
+      <div class="range-label">End time: <strong id="endVal">${dur}</strong>s</div>
+      <input type="range" class="trim-range" id="trimEnd" min="0" max="${dur}" value="${dur}" oninput="syncTrimmer()">
+    </div>
+    <div class="trim-values">
+      <span>Start: <strong id="startDisp">0s</strong></span>
+      <span>End: <strong id="endDisp">${dur}s</strong></span>
+      <span>Clip: <strong id="durDisp">${dur}s</strong></span>
+    </div>
+  </div>`;
+}
+
+function syncTrimmer() {
+  const s = document.getElementById('trimStart');
+  const e = document.getElementById('trimEnd');
+  if (!s || !e) return;
+  let sv = parseFloat(s.value), ev = parseFloat(e.value);
+  if (sv > ev) { sv = ev; s.value = ev; }
+  document.getElementById('startVal').textContent = sv;
+  document.getElementById('endVal').textContent = ev;
+  document.getElementById('startDisp').textContent = sv + 's';
+  document.getElementById('endDisp').textContent = ev + 's';
+  document.getElementById('durDisp').textContent = (ev - sv).toFixed(1) + 's';
+}
+
+function dlVideo(url, filename) {
+  if (!url) { showToast('⚠️ No URL available'); return; }
+  fetch(url)
+    .then(r => { if (!r.ok) throw new Error(); return r.blob(); })
+    .then(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob); a.download = filename; a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      showToast('✅ Download started: ' + filename);
+    })
+    .catch(() => { window.open(url, '_blank'); showToast('📂 Opened in new tab — save from there'); });
+}
+
+function downloadWithQuality(videoUrl, author, musicUrl) {
+  const q = document.getElementById('qualitySelect')?.value || 'hd';
+  if (q === 'audio') {
+    if (musicUrl) dlVideo(musicUrl, `CSK_Audio_${author}.mp3`);
+    else showToast('⚠️ Audio not available for this video');
+  } else if (q === 'sd') {
+    dlVideo(videoUrl, `CSK_Video_${author}_SD.mp4`);
+  } else {
+    dlVideo(videoUrl, `CSK_Video_${author}_HD.mp4`);
+  }
+}
+
+function copyLink(url) {
+  navigator.clipboard.writeText(url)
+    .then(() => showToast('📋 Link copied!'))
+    .catch(() => showToast('Could not copy — try manually'));
+}
+
+function shareWA(u) { window.open(`https://wa.me/?text=${encodeURIComponent('Watch this TikTok: ' + u)}`, '_blank'); }
+function shareTG(u) { window.open(`https://t.me/share/url?url=${encodeURIComponent(u)}&text=Check this TikTok!`, '_blank'); }
+function shareFB(u) { window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(u)}`, '_blank'); }
+function shareTW(u) { window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(u)}&text=Check this TikTok video!`, '_blank'); }
+
+function addToHistory(data) {
+  history_.unshift({ url: data.url, title: data.title, author: data.author, time: new Date().toLocaleString() });
+  if (history_.length > 20) history_.pop();
+  saveCurrentUserData();
+  renderHistory();
+}
+
+function renderHistory() {
+  const el = document.getElementById('historyList');
+  if (!el) return;
+  if (history_.length === 0) {
+    el.innerHTML = '<div class="history-empty">No download history yet</div>'; return;
+  }
+  el.innerHTML = history_.map(h => `
+    <div class="history-item" onclick="loadUrl('${escAttr(h.url)}')">
+      📹 ${escHtml(h.title.substring(0, 50))}… &nbsp;<small style="opacity:.5">${h.time}</small>
+    </div>`).join('');
+}
+
+function clearHistory() {
+  if (!confirm('Clear all download history?')) return;
+  history_ = []; saveCurrentUserData(); renderHistory(); showToast('🗑 History cleared');
+}
+
+function loadUrl(url) {
+  document.getElementById('videoUrl').value = url;
+  toggleSection('historyBox');
+  processVideo();
+}
+
+function addToFavorites(url, title) {
+  if (favorites_.some(f => f.url === url)) { showToast('Already in favorites ⭐'); return; }
+  favorites_.push({ url, title, time: new Date().toLocaleString() });
+  saveCurrentUserData(); renderFavorites(); showToast('⭐ Saved to favorites!');
+}
+
+function renderFavorites() {
+  const el = document.getElementById('favList');
+  if (!el) return;
+  if (favorites_.length === 0) {
+    el.innerHTML = '<div class="fav-empty">No favorites saved yet</div>'; return;
+  }
+  el.innerHTML = favorites_.map(f => `
+    <div class="fav-item" onclick="loadUrl('${escAttr(f.url)}')">
+      ⭐ ${escHtml(f.title.substring(0, 50))}… &nbsp;<small style="opacity:.5">${f.time}</small>
+    </div>`).join('');
+}
+
+function clearFavorites() {
+  if (!confirm('Clear all favorites?')) return;
+  favorites_ = []; saveCurrentUserData(); renderFavorites(); showToast('🗑 Favorites cleared');
+}
+
+async function processBatch() {
+  const lines = document.getElementById('batchUrls').value
+    .split('\n').map(l => l.trim()).filter(l => l && isTikTokUrl(l));
+  if (lines.length === 0) { showToast('⚠️ No valid TikTok URLs found'); return; }
+  if (lines.length > 5) { showToast('⚠️ Maximum 5 URLs at a time'); return; }
+  showToast(`⏳ Processing ${lines.length} videos…`);
+  for (let i = 0; i < lines.length; i++) {
+    document.getElementById('videoUrl').value = lines[i];
+    await processVideo();
+    if (i < lines.length - 1) await new Promise(r => setTimeout(r, 2200));
+  }
+  showToast(`✅ Batch complete! Processed ${lines.length} videos`);
+}
+
+function setSearchTab(type, el) {
+  searchTabType = type;
+  document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  const inp = document.getElementById('searchInput');
+  if (type === 'hashtag') inp.placeholder = 'Enter hashtag…';
+  else if (type === 'music') inp.placeholder = 'Enter song name…';
+  else { inp.placeholder = 'Showing trending…'; showTrending(); }
+}
+
+function searchKeydown(e) {
+  if (e.key !== 'Enter') return;
+  if (searchTabType === 'hashtag') doHashtagSearch();
+  else if (searchTabType === 'music') doMusicSearch();
+}
+
+function doHashtagSearch() {
+  const q = document.getElementById('searchInput').value.trim();
+  if (!q) return;
+  const tag = q.startsWith('#') ? q : '#' + q;
+  showToast(`Searching ${tag} — paste a video URL to download`);
+}
+
+function doMusicSearch() {
+  showToast('🎵 Music search coming soon — try pasting a video URL');
+}
+
+function showTrending() {
+  const trending = [
+    { icon: '🔥', tag: '#dance', views: '2.5B' },
+    { icon: '😂', tag: '#comedy', views: '1.8B' },
+    { icon: '⭐', tag: '#fyp', views: '1.5B' },
+    { icon: '🚀', tag: '#viral', views: '1.2B' },
+    { icon: '📈', tag: '#trending', views: '980M' },
+    { icon: '🎵', tag: '#music', views: '850M' },
+  ];
+  const el = document.getElementById('searchResults');
+  if (el) el.innerHTML = trending.map(t => `
+    <div class="s-result" onclick="document.getElementById('searchInput').value='${t.tag}'; showToast('Paste a TikTok video URL to download')">
+      <span>${t.icon}</span><span>${t.tag}</span>
+      <span style="margin-left:auto; font-size:.75rem; opacity:.5">${t.views} views</span>
+    </div>`).join('');
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  const d = document.createElement('div');
+  d.textContent = s;
+  return d.innerHTML;
+}
+
+function escAttr(s) {
+  if (!s) return '';
+  return s.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+}
+
+// Auto-save when page is closed/refreshed
+window.addEventListener('beforeunload', () => saveCurrentUserData());
+</script>
+</body>
+</html>
